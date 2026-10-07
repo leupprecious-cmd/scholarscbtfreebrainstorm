@@ -36,6 +36,13 @@
       "when": 1791406389703,
       "tag": "0004_proctoring",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791408331135,
+      "tag": "0005_fix_question_shuffle",
+      "breakpoints": true
     }
   ]
 }
