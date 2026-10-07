@@ -2,6 +2,22 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { pct } from "@/lib/auth";
 
+// The database hands back at most 1000 rows per request, so anything that can
+// grow past that (question banks, results) has to be read a page at a time.
+export async function fetchAll<T = Record<string, unknown>>(
+  build: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>,
+  step = 500,
+): Promise<T[]> {
+  const out: T[] = [];
+  for (let from = 0; ; from += step) {
+    const { data, error } = await build(from, from + step - 1);
+    if (error) throw new Error(error.message);
+    const rows = data ?? [];
+    out.push(...rows);
+    if (rows.length < step) return out;
+  }
+}
+
 export function useAdminResults() {
   return useQuery({
     queryKey: ["admin-results"],
