@@ -41,8 +41,10 @@ function toBlocks(text: string): Block[] {
   let cur: Block | null = null;
   for (const raw of lines) {
     const line = raw.replace(/\s+$/, "");
-    if (!line.trim()) continue;
+    // a blank line finishes the current question
+    if (!line.trim()) { cur = null; continue; }
     const isStart = START.test(line) && !OPT.test(line);
+    // a numbered line also starts a new question, even without a blank line
     if (!cur || (isStart && cur.lines.length > 0)) {
       cur = { lines: [] };
       blocks.push(cur);
