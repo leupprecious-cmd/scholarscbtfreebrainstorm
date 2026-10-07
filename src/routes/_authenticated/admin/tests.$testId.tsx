@@ -37,7 +37,7 @@ function EditTest() {
   const drawn = t.draw_count && t.draw_count < questions.length ? t.draw_count : questions.length;
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin-test-qs", testId] }); qc.invalidateQueries({ queryKey: ["admin-tests"] }); };
 
-  async function setStatus(status: string) {
+  const setStatus = async (status: string) => {
     if (status === "published" && questions.length === 0) { toast.error("Add at least one question first"); return; }
     if (status === "published" && t.draw_count && t.draw_count > questions.length) {
       toast.error(`You asked to give each student ${t.draw_count} questions, but this test has only ${questions.length}. Add more questions or lower the number.`);
@@ -48,7 +48,7 @@ function EditTest() {
     toast.success(status === "published" ? "Test published! Students can now see it." : status === "closed" ? "Test closed" : "Saved as draft");
     qc.invalidateQueries({ queryKey: ["admin-test", testId] });
     qc.invalidateQueries({ queryKey: ["admin-tests"] });
-  }
+  };
   async function del(id: string) {
     if (!confirm("Delete this question?")) return;
     await supabase.from("questions").delete().eq("id", id);
