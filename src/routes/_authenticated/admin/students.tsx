@@ -23,14 +23,14 @@ function Students() {
     },
   });
   const results = useAdminResults();
-  const rows = (data ?? []).filter((s) => `${s.full_name} ${s.student_id} ${s.class} ${s.email}`.toLowerCase().includes(q.toLowerCase()));
+  const rows = (data ?? []).filter((s) => `${s.full_name} ${s.student_id} ${s.class} ${s.email} ${s.phone}`.toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
       <h1 className="text-3xl font-extrabold">Students</h1>
       <Input className="mt-4 max-w-sm" placeholder="Search by name, ID or class..." value={q} onChange={(e) => setQ(e.target.value)} />
       <div className="mt-4 overflow-x-auto rounded-2xl border bg-card">
         <table className="w-full min-w-[640px] text-left text-sm">
-          <thead className="bg-muted"><tr><th className="p-3">Name</th><th className="p-3">Student ID</th><th className="p-3">Class</th><th className="p-3">Email</th><th className="p-3">Tests taken</th><th className="p-3">Average</th></tr></thead>
+          <thead className="bg-muted"><tr><th className="p-3">Name</th><th className="p-3">Student ID</th><th className="p-3">Class</th><th className="p-3">Contact</th><th className="p-3">Tests taken</th><th className="p-3">Average</th></tr></thead>
           <tbody>
             {rows.map((s) => {
               const mine = (results.data ?? []).filter((r) => r.student_id === s.id && r.status === "submitted");
@@ -38,7 +38,7 @@ function Students() {
               return (
                 <tr key={s.id} className="border-t">
                   <td className="p-3 font-bold">{s.full_name}</td><td className="p-3">{s.student_id}</td><td className="p-3">{s.class}</td>
-                  <td className="p-3">{s.email}</td><td className="p-3">{mine.length}</td><td className="p-3">{avg === null ? "—" : `${avg}%`}</td>
+                  <td className="p-3">{s.email}<div className="text-xs text-muted-foreground">{s.phone}</div></td><td className="p-3">{mine.length}</td><td className="p-3">{avg === null ? "—" : `${avg}%`}</td>
                 </tr>
               );
             })}

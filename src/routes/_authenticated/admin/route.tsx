@@ -1,8 +1,8 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { BarChart3, FilePlus2, FileText, LayoutDashboard, ListChecks, LogOut, Settings, Users } from "lucide-react";
+import { BarChart3, FileText, LayoutDashboard, ListChecks, LogOut, Settings, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getIsAdmin, useSettings } from "@/lib/auth";
+import { getIsAdmin } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ context }) => {
@@ -15,8 +15,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 const nav = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/admin/tests/new", label: "Create Test", icon: FilePlus2, exact: true },
-  { to: "/admin/tests", label: "My Tests", icon: FileText, exact: true },
+  { to: "/admin/tests", label: "Tests", icon: FileText, exact: false },
   { to: "/admin/questions", label: "Questions", icon: ListChecks, exact: false },
   { to: "/admin/students", label: "Students", icon: Users, exact: false },
   { to: "/admin/results", label: "Results", icon: BarChart3, exact: false },
@@ -24,7 +23,6 @@ const nav = [
 ] as const;
 
 function AdminLayout() {
-  const { data: s } = useSettings();
   const qc = useQueryClient();
   const navigate = useNavigate();
   async function signOut() {
@@ -38,7 +36,7 @@ function AdminLayout() {
       <aside className="bg-sidebar text-sidebar-foreground md:sticky md:top-0 md:h-screen md:w-60 md:shrink-0">
         <div className="px-4 py-4">
           <p className="text-xs uppercase tracking-widest opacity-70">Admin</p>
-          <p className="font-display text-lg font-bold">{s?.lesson_name}</p>
+          <p className="font-display text-lg font-extrabold">SCHOLARS CBT</p>
         </div>
         <nav className="flex gap-1 overflow-x-auto px-2 pb-3 md:flex-col md:overflow-visible">
           {nav.map((n) => (
