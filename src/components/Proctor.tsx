@@ -3,8 +3,20 @@ import { Camera, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { flushAdminEmails } from "@/lib/notify.functions";
+
+const flush = () => { void flushAdminEmails().catch(() => {}); };
 
 const SNAP_MS = 75_000;
+const LIVE_MS = 5_000;
+const CLIP_MS = 30_000;
+const FLUSH_MS = 120_000;
+
+function pickMime() {
+  if (typeof MediaRecorder === "undefined") return "";
+  for (const m of ["video/webm;codecs=vp8", "video/webm", "video/mp4"]) if (MediaRecorder.isTypeSupported(m)) return m;
+  return "";
+}
 
 /** Blocks the exam until the camera is on, then takes periodic snapshots and logs tab switches. */
 export function Proctor({ attemptId, studentId, children }: { attemptId: string; studentId: string; children: React.ReactNode }) {
@@ -18,17 +30,18 @@ export function Proctor({ attemptId, studentId, children }: { attemptId: string;
     await supabase.from("proctor_events").insert({ attempt_id: attemptId, student_id: studentId, kind, photo_path });
   }, [attemptId, studentId]);
 
-  const snap = useCallback(async () => {
+  const snap = useCallback(async (kind: "snapshot" | "live" = "snapshot") => {
     const v = videoRef.current;
     if (!v || !v.videoWidth) return;
     const c = document.createElement("canvas");
-    c.width = 320; c.height = Math.round((320 * v.videoHeight) / v.videoWidth);
+    const w = kind === "live" ? 480 : 320;
+    c.width = w; c.height = Math.round((w * v.videoHeight) / v.videoWidth);
     c.getContext("2d")?.drawImage(v, 0, 0, c.width, c.height);
     const blob = await new Promise<Blob | null>((r) => c.toBlob(r, "image/jpeg", 0.6));
     if (!blob) return;
-    const path = `${studentId}/${attemptId}/${Date.now()}.jpg`;
+    const path = `${studentId}/${attemptId}/${kind === "live" ? "live-" : ""}${Date.now()}.jpg`;
     const { error } = await supabase.storage.from("proctor").upload(path, blob, { contentType: "image/jpeg" });
-    if (!error) await log("snapshot", path);
+    if (!error) await log(kind, path);
   }, [attemptId, studentId, log]);
 
   const start = useCallback(async () => {
@@ -36,7 +49,7 @@ export function Proctor({ attemptId, studentId, children }: { attemptId: string;
     try {
       const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 640 }, audio: false });
       streamRef.current = s;
-      s.getVideoTracks()[0]?.addEventListener("ended", () => { setReady(false); void log("camera_off"); });
+      s.getVideoTracks()[0]?.addEventListener("ended", () => { setReady(false); void log("camera_off").then(flush); });
       setReady(true);
     } catch {
       setErr("Camera access was blocked. Allow the camera in your browser settings, then tap the button again.");
@@ -54,14 +67,48 @@ export function Proctor({ attemptId, studentId, children }: { attemptId: string;
     if (!ready) return;
     const first = setTimeout(() => void snap(), 3000);
     const t = setInterval(() => void snap(), SNAP_MS);
-    return () => { clearTimeout(first); clearInterval(t); };
+    const live = setInterval(() => void snap("live"), LIVE_MS);
+    const f = setInterval(flush, FLUSH_MS);
+    flush();
+    return () => { clearTimeout(first); clearInterval(t); clearInterval(live); clearInterval(f); };
   }, [ready, snap]);
+
+  // Continuous recording, cut into 30-second clips so each one uploads on its own.
+  useEffect(() => {
+    const stream = streamRef.current;
+    const mime = pickMime();
+    if (!ready || !stream || !mime) return;
+    let stopped = false;
+    let rec: MediaRecorder | null = null;
+    const ext = mime.includes("mp4") ? "mp4" : "webm";
+    const startClip = () => {
+      if (stopped) return;
+      const chunks: Blob[] = [];
+      const started = Date.now();
+      rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 200_000 });
+      rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+      rec.onstop = async () => {
+        startClip();
+        const blob = new Blob(chunks, { type: mime.split(";")[0] });
+        if (!blob.size) return;
+        const path = `${studentId}/${attemptId}/video-${started}.${ext}`;
+        const { error } = await supabase.storage.from("proctor").upload(path, blob, { contentType: blob.type });
+        if (!error) await log("video", path);
+      };
+      rec.start();
+      setTimeout(() => { if (rec && rec.state === "recording") rec.stop(); }, CLIP_MS);
+    };
+    startClip();
+    const onHide = () => { if (rec && rec.state === "recording") rec.stop(); };
+    window.addEventListener("pagehide", onHide);
+    return () => { window.removeEventListener("pagehide", onHide); stopped = true; if (rec && rec.state === "recording") rec.stop(); };
+  }, [ready, attemptId, studentId, log]);
 
   useEffect(() => {
     const onVis = () => {
       if (document.visibilityState === "hidden") {
         setSwitches((n) => n + 1);
-        void log("tab_switch");
+        void log("tab_switch").then(flush);
         toast.warning("Leaving the test page is recorded and reported to your examiner.");
       }
     };
@@ -114,6 +161,7 @@ export function ProctorReview({ attemptId }: { attemptId: string }) {
   }, [attemptId]);
   if (!items) return <p className="text-sm text-muted-foreground">Loading supervision record...</p>;
   const photos = items.filter((i) => i.kind === "snapshot");
+  const clips = items.filter((i) => i.kind === "video" && i.url);
   const tabs = items.filter((i) => i.kind === "tab_switch").length;
   const camOff = items.filter((i) => i.kind === "camera_off").length;
   return (
@@ -122,6 +170,11 @@ export function ProctorReview({ attemptId }: { attemptId: string }) {
         <span className="rounded-full bg-muted px-3 py-1">{photos.length} photos</span>
         <span className={tabs ? "rounded-full bg-destructive/15 px-3 py-1 font-bold text-destructive" : "rounded-full bg-muted px-3 py-1"}>{tabs} tab switches</span>
         {camOff > 0 && <span className="rounded-full bg-destructive/15 px-3 py-1 font-bold text-destructive">Camera turned off {camOff}×</span>}
+      </div>
+      <div className="mt-3">
+        <p className="mb-1 text-sm font-bold">Exam recording</p>
+        {clips.length === 0 ? <p className="text-sm text-muted-foreground">No recording yet. Clips appear every 30 seconds while the student writes.</p>
+          : <RecordingPlayer clips={clips.map((c) => ({ url: c.url!, at: c.created_at }))} />}
       </div>
       {photos.length === 0 ? <p className="mt-3 text-sm text-muted-foreground">No photos recorded for this attempt.</p> : (
         <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
@@ -133,6 +186,59 @@ export function ProctorReview({ attemptId }: { attemptId: string }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Plays the 30-second clips back to back, like one continuous video. */
+export function RecordingPlayer({ clips }: { clips: { url: string; at: string }[] }) {
+  const [i, setI] = useState(0);
+  const ref = useRef<HTMLVideoElement>(null);
+  const cur = clips[Math.min(i, clips.length - 1)];
+  useEffect(() => { if (i > 0) void ref.current?.play().catch(() => {}); }, [i]);
+  if (!cur) return null;
+  return (
+    <div>
+      <video ref={ref} key={cur.url} src={cur.url} controls playsInline className="w-full rounded-xl bg-muted"
+        onEnded={() => setI((n) => (n + 1 < clips.length ? n + 1 : n))} />
+      <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
+        <span>Part {Math.min(i, clips.length - 1) + 1} of {clips.length} · {new Date(cur.at).toLocaleTimeString()}</span>
+        <span className="flex gap-2">
+          <button className="font-bold text-primary disabled:opacity-40" disabled={i === 0} onClick={() => setI((n) => n - 1)}>Previous</button>
+          <button className="font-bold text-primary disabled:opacity-40" disabled={i >= clips.length - 1} onClick={() => setI((n) => n + 1)}>Next</button>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/** Near-live view: refreshes the student's newest camera frame every few seconds. */
+export function LiveView({ attemptId }: { attemptId: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [at, setAt] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      const { data } = await supabase.from("proctor_events").select("photo_path,created_at")
+        .eq("attempt_id", attemptId).in("kind", ["live", "snapshot"]).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (!alive || !data?.photo_path) return;
+      const s = await supabase.storage.from("proctor").createSignedUrl(data.photo_path, 120);
+      if (alive && s.data) { setUrl(s.data.signedUrl); setAt(data.created_at); }
+    };
+    void load();
+    const t = setInterval(load, 4000);
+    return () => { alive = false; clearInterval(t); };
+  }, [attemptId]);
+  return (
+    <div>
+      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted">
+        {url ? <img src={url} alt="Live camera" className="h-full w-full object-cover" /> :
+          <p className="flex h-full items-center justify-center text-sm text-muted-foreground">Waiting for camera...</p>}
+        <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-destructive px-2 py-0.5 text-xs font-bold text-destructive-foreground">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-destructive-foreground" />LIVE
+        </span>
+      </div>
+      {at && <p className="mt-1 text-xs text-muted-foreground">Updated {new Date(at).toLocaleTimeString()}</p>}
     </div>
   );
 }
