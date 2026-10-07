@@ -34,10 +34,15 @@ function EditTest() {
   if (!t) return <p>Loading...</p>;
   const questions = qs.data ?? [];
   const total = questions.reduce((s, q) => s + Number(q.marks), 0);
+  const drawn = t.draw_count && t.draw_count < questions.length ? t.draw_count : questions.length;
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin-test-qs", testId] }); qc.invalidateQueries({ queryKey: ["admin-tests"] }); };
 
   async function setStatus(status: string) {
     if (status === "published" && questions.length === 0) { toast.error("Add at least one question first"); return; }
+    if (status === "published" && t.draw_count && t.draw_count > questions.length) {
+      toast.error(`You asked to give each student ${t.draw_count} questions, but this test has only ${questions.length}. Add more questions or lower the number.`);
+      return;
+    }
     const { error } = await supabase.from("tests").update({ status }).eq("id", testId);
     if (error) { toast.error(error.message); return; }
     toast.success(status === "published" ? "Test published! Students can now see it." : status === "closed" ? "Test closed" : "Saved as draft");
@@ -94,7 +99,7 @@ function EditTest() {
         </TabsContent>
 
         <TabsContent value="details" className="mt-4 rounded-2xl border bg-card p-6">
-          <TestForm key={t.id + t.title} initial={t} submitLabel="Save Details" onSubmit={async (v) => {
+          <TestForm key={t.id + t.title} initial={t} questionCount={questions.length} submitLabel="Save Details" onSubmit={async (v) => {
             const { error } = await supabase.from("tests").update(v).eq("id", testId);
             if (error) { toast.error(error.message); return; }
             toast.success("Saved");
@@ -109,6 +114,9 @@ function EditTest() {
               ["Test name", t.title], ["Subject", t.subject], ["Class", t.class || "All classes"],
               ["Questions", questions.length], ["Total marks", total], ["Duration", `${t.duration_minutes} minutes`],
               ["Pass mark", `${t.pass_percentage}%`],
+              ["Each student gets", drawn === questions.length ? `${drawn} questions` : `${drawn} of ${questions.length}, drawn at random`],
+              ["Question order", t.shuffle_questions ? "Shuffled for each student" : "Same for everyone"],
+              ["Answer options", t.shuffle_options ? "Shuffled for each student" : "Same for everyone"],
               ["Start", t.start_at ? new Date(t.start_at).toLocaleString() : "Anytime"],
               ["End", t.end_at ? new Date(t.end_at).toLocaleString() : "No end"],
             ].map(([k, v]) => (
