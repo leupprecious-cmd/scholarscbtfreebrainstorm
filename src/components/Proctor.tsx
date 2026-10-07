@@ -101,7 +101,7 @@ export function Proctor({ attemptId, studentId, children }: { attemptId: string;
 }
 
 export function ProctorReview({ attemptId }: { attemptId: string }) {
-  const [items, setItems] = useState<{ id: string; kind: string; created_at: string; url?: string }[] | null>(null);
+  const [items, setItems] = useState<{ id: string; kind: string; created_at: string; url?: string | null | undefined }[] | null>(null);
   useEffect(() => {
     void (async () => {
       const { data } = await supabase.from("proctor_events").select("*").eq("attempt_id", attemptId).order("created_at");
