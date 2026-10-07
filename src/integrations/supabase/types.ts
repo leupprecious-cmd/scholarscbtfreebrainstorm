@@ -40,6 +40,7 @@ export type Database = {
           answers: Json
           correct_count: number
           deadline: string
+          delivery: Json
           id: string
           manual_marks: Json
           pending_grading: boolean
@@ -57,6 +58,7 @@ export type Database = {
           answers?: Json
           correct_count?: number
           deadline: string
+          delivery?: Json
           id?: string
           manual_marks?: Json
           pending_grading?: boolean
@@ -74,6 +76,7 @@ export type Database = {
           answers?: Json
           correct_count?: number
           deadline?: string
+          delivery?: Json
           id?: string
           manual_marks?: Json
           pending_grading?: boolean
@@ -212,12 +215,15 @@ export type Database = {
           attempts_allowed: number
           class: string
           created_at: string
+          draw_count: number | null
           duration_minutes: number
           end_at: string | null
           id: string
           instructions: string
           pass_percentage: number
           show_results: boolean
+          shuffle_options: boolean
+          shuffle_questions: boolean
           start_at: string | null
           status: string
           subject: string
@@ -227,12 +233,15 @@ export type Database = {
           attempts_allowed?: number
           class?: string
           created_at?: string
+          draw_count?: number | null
           duration_minutes?: number
           end_at?: string | null
           id?: string
           instructions?: string
           pass_percentage?: number
           show_results?: boolean
+          shuffle_options?: boolean
+          shuffle_questions?: boolean
           start_at?: string | null
           status?: string
           subject?: string
@@ -242,12 +251,15 @@ export type Database = {
           attempts_allowed?: number
           class?: string
           created_at?: string
+          draw_count?: number | null
           duration_minutes?: number
           end_at?: string | null
           id?: string
           instructions?: string
           pass_percentage?: number
           show_results?: boolean
+          shuffle_options?: boolean
+          shuffle_questions?: boolean
           start_at?: string | null
           status?: string
           subject?: string
@@ -280,6 +292,7 @@ export type Database = {
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
       admin_reset_attempt: { Args: { _attempt_id: string }; Returns: undefined }
+      build_delivery: { Args: { _attempt_id: string }; Returns: Json }
       claim_admin: { Args: never; Returns: boolean }
       finalize_if_expired: { Args: { _attempt_id: string }; Returns: undefined }
       get_attempt: { Args: { _attempt_id: string }; Returns: Json }
