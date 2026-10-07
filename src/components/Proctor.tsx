@@ -89,7 +89,7 @@ export function Proctor({ attemptId, studentId, children }: { attemptId: string;
       rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
       rec.onstop = async () => {
         startClip();
-        const blob = new Blob(chunks, { type: mime.split(";")[0] });
+        const blob = new Blob(chunks, { type: mime.split(";")[0] ?? mime });
         if (!blob.size) return;
         const path = `${studentId}/${attemptId}/video-${started}.${ext}`;
         const { error } = await supabase.storage.from("proctor").upload(path, blob, { contentType: blob.type });
