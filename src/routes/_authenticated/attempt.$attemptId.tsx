@@ -13,6 +13,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Proctor } from "@/components/Proctor";
+import { Calculator } from "@/components/Calculator";
 
 export const Route = createFileRoute("/_authenticated/attempt/$attemptId")({
   head: () => ({ meta: [{ title: "Taking Test — SCHOLARS CBT" }] }),
@@ -121,6 +122,7 @@ function Runner({ data }: { data: AttemptData }) {
 
   return (
     <div className="min-h-screen bg-background pb-28">
+      <Calculator />
       <header className="sticky top-0 z-10 border-b bg-card">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <div className="min-w-0">
