@@ -14,23 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          attempt_id: string | null
+          body: string
+          created_at: string
+          emailed: boolean
+          id: string
+          is_read: boolean
+          kind: string
+          title: string
+        }
+        Insert: {
+          attempt_id?: string | null
+          body?: string
+          created_at?: string
+          emailed?: boolean
+          id?: string
+          is_read?: boolean
+          kind: string
+          title: string
+        }
+        Update: {
+          attempt_id?: string | null
+          body?: string
+          created_at?: string
+          emailed?: boolean
+          id?: string
+          is_read?: boolean
+          kind?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      announcements: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          target_class: string
+          target_student: string | null
+          title: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          target_class?: string
+          target_student?: string | null
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          target_class?: string
+          target_student?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
+          admin_last_seen: string | null
           grade_scale: Json
           id: number
+          last_email_at: string | null
           lesson_name: string
+          notify_email: string
           show_rankings: boolean
         }
         Insert: {
+          admin_last_seen?: string | null
           grade_scale?: Json
           id?: number
+          last_email_at?: string | null
           lesson_name?: string
+          notify_email?: string
           show_rankings?: boolean
         }
         Update: {
+          admin_last_seen?: string | null
           grade_scale?: Json
           id?: number
+          last_email_at?: string | null
           lesson_name?: string
+          notify_email?: string
           show_rankings?: boolean
         }
         Relationships: []
@@ -350,6 +419,7 @@ export type Database = {
     }
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
+      admin_heartbeat: { Args: never; Returns: undefined }
       admin_live_attempts: {
         Args: never
         Returns: {
