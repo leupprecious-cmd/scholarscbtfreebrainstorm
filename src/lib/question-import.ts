@@ -71,22 +71,22 @@ export function parseQuestions(raw: string): { questions: ParsedQ[]; problems: s
 
     for (const line of b.lines) {
       const a = ANS.exec(line);
-      if (a && !OPT.test(line)) { answer = clean(a[1]); continue; }
+      if (a && !OPT.test(line)) { answer = clean(a[1] ?? ""); continue; }
 
       const o = OPT.exec(line);
-      if (o && text && o[1].toUpperCase() === nextLetter) {
-        options.push(clean(o[2]));
+      if (o && text && (o[1] ?? "").toUpperCase() === nextLetter) {
+        options.push(clean(o[2] ?? ""));
         nextLetter = String.fromCharCode(nextLetter.charCodeAt(0) + 1);
         continue;
       }
 
       if (!text) {
         const s = START.exec(line);
-        let body = clean(s ? s[1] : line);
+        let body = clean(s ? (s[1] ?? "") : line);
         const m = MARKS.exec(body);
         if (m) {
-          marks = Math.max(0.25, Number(m[1]) || 1);
-          body = clean(body.replace(m[0], ""));
+          marks = Math.max(0.25, Number(m[1] ?? "") || 1);
+          body = clean(body.replace(m[0] ?? "", ""));
         }
         text = body;
         continue;
@@ -99,8 +99,8 @@ export function parseQuestions(raw: string): { questions: ParsedQ[]; problems: s
 
     const isTF =
       options.length === 2 &&
-      options[0].toLowerCase() === "true" &&
-      options[1].toLowerCase() === "false";
+      (options[0] ?? "").toLowerCase() === "true" &&
+      (options[1] ?? "").toLowerCase() === "false";
 
     if (!options.length) {
       if (!answer) { problems.push(`"${text.slice(0, 50)}…" was skipped: no correct answer found.`); return; }
@@ -114,7 +114,7 @@ export function parseQuestions(raw: string): { questions: ParsedQ[]; problems: s
       const t = answer.trim();
       const byLetter = /^([A-Ha-h])\b/.exec(t);
       if (byLetter) {
-        const i = byLetter[1].toUpperCase().charCodeAt(0) - 65;
+        const i = (byLetter[1] ?? "").toUpperCase().charCodeAt(0) - 65;
         if (i >= 0 && i < options.length) correct = String.fromCharCode(65 + i);
       }
       if (!correct) {
