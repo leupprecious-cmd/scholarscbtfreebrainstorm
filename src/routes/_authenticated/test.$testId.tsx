@@ -20,10 +20,21 @@ function Instructions() {
     queryFn: async () => (await supabase.rpc("student_tests")).data ?? [],
   });
   const t = data?.find((x) => x.id === testId);
+  const cfg = useQuery({
+    queryKey: ["test-subjects", testId],
+    queryFn: async () => (await supabase.rpc("test_subject_config", { _test_id: testId })).data as unknown as
+      { multi_subject: boolean; per_subject_count: number; compulsory: string[]; electives: string[]; pick: number } | null,
+  });
+  const [picked, setPicked] = useState<string[]>([]);
+  const multi = cfg.data?.multi_subject ?? false;
+  const pick = cfg.data?.pick ?? 2;
+  const toggle = (n: string) => setPicked((p) => p.includes(n) ? p.filter((x) => x !== n) : p.length >= pick ? p : [...p, n]);
 
   async function start() {
     setBusy(true);
-    const { data: id, error } = await supabase.rpc("start_attempt", { _test_id: testId });
+    const { data: id, error } = multi
+      ? await supabase.rpc("start_attempt_subjects", { _test_id: testId, _subjects: picked })
+      : await supabase.rpc("start_attempt", { _test_id: testId });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     navigate({ to: "/attempt/$attemptId", params: { attemptId: id as string } });
@@ -50,7 +61,30 @@ function Instructions() {
           <li>You can flag questions to review before submitting.</li>
           <li>You cannot change answers after submitting.</li>
         </ul>
-        <Button onClick={start} disabled={busy} className="mt-6 h-14 w-full text-lg">{busy ? "Starting..." : "Start CBT"}</Button>
+        {multi && cfg.data && (
+          <div className="mt-6 rounded-2xl border bg-muted/40 p-4">
+            <p className="font-bold">Choose your subjects</p>
+            <p className="text-sm text-muted-foreground">{cfg.data.compulsory.join(", ")} is compulsory. Pick exactly {pick} more. {cfg.data.per_subject_count} questions per subject.</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {cfg.data.compulsory.map((n) => (
+                <div key={n} className="flex items-center justify-between rounded-xl border-2 border-success bg-success/10 p-3 font-bold">
+                  {n}<span className="rounded-full bg-success px-2 py-0.5 text-xs text-success-foreground">Compulsory</span>
+                </div>
+              ))}
+              {cfg.data.electives.map((n) => {
+                const on = picked.includes(n);
+                return (
+                  <button key={n} type="button" onClick={() => toggle(n)}
+                    className={`flex items-center justify-between rounded-xl border-2 p-3 text-left font-bold ${on ? "border-primary bg-primary/10" : "border-border bg-card"}`}>
+                    {n}{on && <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">Selected</span>}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-sm">{picked.length} of {pick} chosen</p>
+          </div>
+        )}
+        <Button onClick={start} disabled={busy || (multi && picked.length !== pick)} className="mt-6 h-14 w-full text-lg">{busy ? "Starting..." : "Start CBT"}</Button>
       </div>
     </StudentShell>
   );

@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/attempt/$attemptId")({
 });
 
 type Opt = { text: string; value: string };
-type Q = { id: string; type: "mcq" | "true_false" | "short" | "written"; text: string; options: Opt[]; marks: number };
+type Q = { id: string; type: "mcq" | "true_false" | "short" | "written"; text: string; options: Opt[]; marks: number; subject?: string };
 type AttemptData = {
   id: string; status: string; deadline: string; server_now: string; answers: Record<string, string>;
   test: { title: string; subject: string }; questions: Q[];
@@ -110,6 +110,7 @@ function Runner({ data }: { data: AttemptData }) {
   const mm = Math.floor(left / 60000), ss = Math.floor((left % 60000) / 1000);
   const setA = (v: string) => setAnswers((a) => ({ ...a, [q!.id]: v }));
   const opts = q?.options ?? [];
+  const subjects = [...new Set(qs.map((x) => x.subject ?? "").filter(Boolean))];
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -128,8 +129,17 @@ function Runner({ data }: { data: AttemptData }) {
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-5">
+        {subjects.length > 1 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {subjects.map((n) => (
+              <Button key={n} size="sm" variant={q?.subject === n ? "default" : "outline"} onClick={() => setIdx(qs.findIndex((x) => x.subject === n))}>
+                {n} ({qs.filter((x) => x.subject === n && (answers[x.id] ?? "").trim()).length}/{qs.filter((x) => x.subject === n).length})
+              </Button>
+            ))}
+          </div>
+        )}
         <div className="mb-5 flex flex-wrap gap-2">
-          {qs.map((x, i) => (
+          {qs.map((x, i) => (subjects.length > 1 && x.subject !== q?.subject) ? null : (
             <button key={x.id} onClick={() => setIdx(i)}
               className={cn("h-10 w-10 rounded-lg border text-sm font-bold",
                 i === idx ? "border-primary bg-primary text-primary-foreground" : flags[x.id] ? "border-warning bg-warning text-warning-foreground" : (answers[x.id] ?? "").trim() ? "border-success bg-success text-success-foreground" : "border-border bg-muted text-muted-foreground")}>
@@ -143,7 +153,7 @@ function Runner({ data }: { data: AttemptData }) {
         </div>
         {q ? (
           <div className="rounded-2xl border bg-card p-5 sm:p-7">
-            <p className="text-sm font-bold text-muted-foreground">Question {idx + 1} of {qs.length} · {q.marks} mark{Number(q.marks) === 1 ? "" : "s"}</p>
+            <p className="text-sm font-bold text-muted-foreground">{q.subject ? `${q.subject} · ` : ""}Question {idx + 1} of {qs.length} · {q.marks} mark{Number(q.marks) === 1 ? "" : "s"}</p>
             <h2 className="mt-2 whitespace-pre-wrap font-sans text-xl font-bold leading-snug tracking-normal">{q.text}</h2>
             <div className="mt-5 space-y-3">
               {(q.type === "mcq" || q.type === "true_false") && opts.map((o, i) => {

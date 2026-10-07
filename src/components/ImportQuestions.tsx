@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const SAMPLE = sampleText();
 
-export function ImportQuestions({ testId, position, onDone }: { testId: string; position: number; onDone: () => void }) {
+export function ImportQuestions({ testId, position, onDone, subject = "" }: { testId: string; position: number; onDone: () => void; subject?: string }) {
   const [open, setOpen] = useState(false);
   const [raw, setRaw] = useState("");
   const [file, setFile] = useState("");
@@ -59,7 +59,7 @@ export function ImportQuestions({ testId, position, onDone }: { testId: string; 
     for (let i = 0; i < parsed.length; i += 100) {
       const chunk = parsed.slice(i, i + 100).map((q) => ({
         test_id: testId, type: q.type, text: q.text, options: q.options,
-        correct_answer: q.correct_answer, marks: q.marks, position: pos++,
+        correct_answer: q.correct_answer, marks: q.marks, position: pos++, subject,
       }));
       const { error } = await supabase.from("questions").insert(chunk);
       if (error) { toast.error(`Stopped after ${done}: ${error.message}`); setBusy(false); return; }

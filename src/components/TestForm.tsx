@@ -11,6 +11,7 @@ export type TestValues = {
   title: string; subject: string; class: string; instructions: string; attempts_allowed: number;
   duration_minutes: number; pass_percentage: number; start_at: string | null; end_at: string | null; show_results: boolean;
   shuffle_questions: boolean; shuffle_options: boolean; draw_count: number | null;
+  multi_subject: boolean; per_subject_count: number;
 };
 
 const toLocal = (iso: string | null) => {
@@ -32,11 +33,13 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
     shuffle_questions: initial?.shuffle_questions ?? false,
     shuffle_options: initial?.shuffle_options ?? false,
     draw_count: initial?.draw_count == null ? "" : String(initial.draw_count),
+    multi_subject: initial?.multi_subject ?? false,
+    per_subject_count: String(initial?.per_subject_count ?? 20),
     sd: s.d, st: s.t, ed: e.d, et: e.t,
   });
   const [busy, setBusy] = useState(false);
   const up = (k: string) => (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setV((prev) => ({ ...prev, [k]: ev.target.value }));
-  const drawn = Number(v.draw_count) > 0 ? Number(v.draw_count) : null;
+  const drawn = !v.multi_subject && Number(v.draw_count) > 0 ? Number(v.draw_count) : null;
   const tooMany = drawn != null && questionCount != null && drawn > questionCount;
 
   return (
@@ -44,10 +47,11 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
       ev.preventDefault();
       setBusy(true);
       await onSubmit({
-        title: v.title.trim(), subject: v.subject, class: v.class === "__all" ? "" : v.class, instructions: v.instructions,
+        title: v.title.trim(), subject: v.multi_subject && !v.subject ? "UTME Combination" : v.subject, class: v.class === "__all" ? "" : v.class, instructions: v.instructions,
         duration_minutes: Number(v.duration_minutes) || 30, pass_percentage: Number(v.pass_percentage) || 50,
         attempts_allowed: Math.max(1, Number(v.attempts_allowed) || 1),
         shuffle_questions: v.shuffle_questions, shuffle_options: v.shuffle_options, draw_count: drawn,
+        multi_subject: v.multi_subject, per_subject_count: Math.max(1, Number(v.per_subject_count) || 20),
         show_results: v.show_results, start_at: fromLocal(v.sd, v.st), end_at: fromLocal(v.ed, v.et),
       });
       setBusy(false);
@@ -80,6 +84,23 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
 
       <div className="space-y-4 rounded-2xl border bg-muted/40 p-4 sm:col-span-2">
         <div>
+          <p className="font-bold">Subject Combination (UTME style)</p>
+          <p className="text-sm text-muted-foreground">Mathematics is compulsory. Each student picks 2 from English, Physics, Chemistry and Biology.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Switch id="ms" checked={v.multi_subject} onCheckedChange={(c) => setV((prev) => ({ ...prev, multi_subject: c }))} />
+          <Label htmlFor="ms" className="cursor-pointer font-normal">Let students choose their subjects</Label>
+        </div>
+        {v.multi_subject && (
+          <F label="Questions per subject">
+            <Input type="number" min={1} value={v.per_subject_count} onChange={up("per_subject_count")} className="max-w-40" />
+            <p className="text-sm text-muted-foreground">Each student gets {(Number(v.per_subject_count) || 0) * 3} questions in total (3 subjects).</p>
+          </F>
+        )}
+      </div>
+
+      <div className="space-y-4 rounded-2xl border bg-muted/40 p-4 sm:col-span-2">
+        <div>
           <p className="font-bold">Question Order (JAMB style)</p>
           <p className="text-sm text-muted-foreground">Every student gets their own copy of the test. Nobody can copy from a neighbour.</p>
         </div>
@@ -91,9 +112,9 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
           <Switch id="so" checked={v.shuffle_options} onCheckedChange={(c) => setV((prev) => ({ ...prev, shuffle_options: c }))} />
           <Label htmlFor="so" className="cursor-pointer font-normal">Shuffle the answer options (A, B, C, D) for each student</Label>
         </div>
-        <F label="Questions to give each student (leave empty to use all)">
+        {!v.multi_subject && <F label="Questions to give each student (leave empty to use all)">
           <Input type="number" min={1} value={v.draw_count} onChange={up("draw_count")} placeholder="e.g. 20" className="max-w-40" />
-        </F>
+        </F>}
         {tooMany && <p className="text-sm font-bold text-destructive">This test has {questionCount} questions, so {drawn} cannot be drawn. Add more questions or lower this number.</p>}
         {!tooMany && drawn != null && questionCount != null && drawn < questionCount && (
           <p className="text-sm text-muted-foreground">Each student will get {drawn} questions chosen at random from your {questionCount}.</p>
@@ -105,7 +126,7 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
         <Switch checked={v.show_results} onCheckedChange={(c) => setV((prev) => ({ ...prev, show_results: c }))} id="sr" />
         <Label htmlFor="sr">Show results to students immediately after submitting</Label>
       </div>
-      <div className="sm:col-span-2"><Button disabled={busy || !v.subject || tooMany} className="h-11">{busy ? "Saving..." : submitLabel}</Button></div>
+      <div className="sm:col-span-2"><Button disabled={busy || (!v.subject && !v.multi_subject) || tooMany} className="h-11">{busy ? "Saving..." : submitLabel}</Button></div>
     </form>
   );
 }

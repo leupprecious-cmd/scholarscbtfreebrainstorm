@@ -34,17 +34,27 @@ function EditTest() {
   });
   const [editing, setEditing] = useState<Question | "new" | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [subj, setSubj] = useState("");
   const t = test.data;
   if (!t) return <p>Loading...</p>;
   const questions = qs.data ?? [];
-  const shown = showAll ? questions : questions.slice(0, 50);
+  const subjects = t.multi_subject ? [...t.compulsory_subjects, ...t.elective_subjects] : [];
+  const cur = t.multi_subject ? (subj || subjects[0] || "") : "";
+  const countOf = (n: string) => questions.filter((q) => q.subject.toLowerCase() === n.toLowerCase()).length;
+  const list = t.multi_subject ? questions.filter((q) => q.subject.toLowerCase() === cur.toLowerCase()) : questions;
+  const shown = showAll ? list : list.slice(0, 50);
+  const short = subjects.filter((n) => countOf(n) < t.per_subject_count);
   const total = questions.reduce((s, q) => s + Number(q.marks), 0);
   const drawn = t.draw_count && t.draw_count < questions.length ? t.draw_count : questions.length;
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin-test-qs", testId] }); qc.invalidateQueries({ queryKey: ["admin-tests"] }); };
 
   const setStatus = async (status: string) => {
+    if (status === "published" && t.multi_subject && short.length) {
+      toast.error(`Each subject needs at least ${t.per_subject_count} questions. Add more to: ${short.join(", ")}`);
+      return;
+    }
     if (status === "published" && questions.length === 0) { toast.error("Add at least one question first"); return; }
-    if (status === "published" && t.draw_count && t.draw_count > questions.length) {
+    if (status === "published" && !t.multi_subject && t.draw_count && t.draw_count > questions.length) {
       toast.error(`You asked to give each student ${t.draw_count} questions, but this test has only ${questions.length}. Add more questions or lower the number.`);
       return;
     }
@@ -76,8 +86,20 @@ function EditTest() {
         </TabsList>
 
         <TabsContent value="questions" className="mt-4 space-y-3">
+          {t.multi_subject && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+              {subjects.map((n) => (
+                <button key={n} type="button" onClick={() => { setSubj(n); setEditing(null); setShowAll(false); }}
+                  className={`rounded-xl border-2 p-3 text-left ${n === cur ? "border-primary bg-primary/10" : "border-border bg-card"}`}>
+                  <p className="font-bold">{n}</p>
+                  <p className="text-xs text-muted-foreground">{countOf(n)} question(s){t.compulsory_subjects.includes(n) ? " · Compulsory" : ""}</p>
+                </button>
+              ))}
+            </div>
+          )}
+          {t.multi_subject && <p className="text-sm font-bold">Adding questions to: {cur}</p>}
           {shown.map((q, i) => editing !== "new" && editing?.id === q.id ? (
-            <QuestionEditor key={q.id} testId={testId} q={q} position={q.position} onDone={() => { setEditing(null); refresh(); }} />
+            <QuestionEditor key={q.id} subject={q.subject} testId={testId} q={q} position={q.position} onDone={() => { setEditing(null); refresh(); }} />
           ) : (
             <div key={q.id} className="rounded-2xl border bg-card p-4">
               <div className="flex items-start justify-between gap-3">
@@ -96,17 +118,17 @@ function EditTest() {
               </div>
             </div>
           ))}
-          {questions.length > shown.length && !editing && (
+          {list.length > shown.length && !editing && (
             <Button variant="outline" className="h-12 w-full border-dashed" onClick={() => setShowAll(true)}>
-              Show all {questions.length} questions
+              Show all {list.length} questions
             </Button>
           )}
           {editing === "new" ? (
-            <QuestionEditor testId={testId} position={questions.length + 1} onDone={() => { setEditing(null); refresh(); }} onSaveAnother={refresh} />
+            <QuestionEditor key={cur} subject={cur} testId={testId} position={questions.length + 1} onDone={() => { setEditing(null); refresh(); }} onSaveAnother={refresh} />
           ) : (
             <div className="space-y-3">
               <Button variant="outline" className="h-12 w-full border-dashed" onClick={() => setEditing("new")}><Plus className="mr-1 h-4 w-4" />Add Question</Button>
-              <ImportQuestions testId={testId} position={questions.length + 1} onDone={refresh} />
+              <ImportQuestions key={cur} subject={cur} testId={testId} position={questions.length + 1} onDone={refresh} />
             </div>
           )}
         </TabsContent>
@@ -127,7 +149,8 @@ function EditTest() {
               ["Test name", t.title], ["Subject", t.subject], ["Class", t.class || "All classes"],
               ["Questions", questions.length], ["Total marks", total], ["Duration", `${t.duration_minutes} minutes`],
               ["Pass mark", `${t.pass_percentage}%`],
-              ["Each student gets", drawn === questions.length ? `${drawn} questions` : `${drawn} of ${questions.length}, drawn at random`],
+              ...(t.multi_subject ? [["Subjects", subjects.map((n) => `${n}: ${countOf(n)}`).join(", ")], ["Each student gets", `${t.per_subject_count} per subject × 3 = ${t.per_subject_count * 3} questions`]] : []),
+              [t.multi_subject ? "Without subjects" : "Each student gets", drawn === questions.length ? `${drawn} questions` : `${drawn} of ${questions.length}, drawn at random`],
               ["Question order", t.shuffle_questions ? "Shuffled for each student" : "Same for everyone"],
               ["Answer options", t.shuffle_options ? "Shuffled for each student" : "Same for everyone"],
               ["Start", t.start_at ? new Date(t.start_at).toLocaleString() : "Anytime"],
@@ -147,7 +170,7 @@ function EditTest() {
   );
 }
 
-function QuestionEditor({ testId, q, position, onDone, onSaveAnother }: { testId: string; q?: Question; position: number; onDone: () => void; onSaveAnother?: () => void }) {
+function QuestionEditor({ testId, q, position, onDone, onSaveAnother, subject = "" }: { subject?: string; testId: string; q?: Question; position: number; onDone: () => void; onSaveAnother?: () => void }) {
   const blank = { type: "mcq", text: "", options: ["", "", "", ""], correct_answer: "", marks: 1 };
   const [v, setV] = useState(q ? { type: q.type, text: q.text, options: (q.options as string[]).length ? (q.options as string[]) : ["", "", "", ""], correct_answer: q.correct_answer, marks: Number(q.marks) } : blank);
   const [busy, setBusy] = useState(false);
@@ -159,7 +182,7 @@ function QuestionEditor({ testId, q, position, onDone, onSaveAnother }: { testId
     if (v.type === "mcq" && options.length < 2) { toast.error("Add at least two options"); return; }
     if (v.type !== "written" && !v.correct_answer.trim()) { toast.error("Select or enter the correct answer"); return; }
     setBusy(true);
-    const row = { test_id: testId, type: v.type, text: v.text.trim(), options, correct_answer: v.correct_answer.trim(), marks: Number(v.marks) || 1, position: q ? q.position : pos };
+    const row = { subject, test_id: testId, type: v.type, text: v.text.trim(), options, correct_answer: v.correct_answer.trim(), marks: Number(v.marks) || 1, position: q ? q.position : pos };
     const { error } = q ? await supabase.from("questions").update(row).eq("id", q.id) : await supabase.from("questions").insert(row);
     setBusy(false);
     if (error) { toast.error(error.message); return; }
