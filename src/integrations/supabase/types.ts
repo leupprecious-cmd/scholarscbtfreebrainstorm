@@ -121,6 +121,41 @@ export type Database = {
         }
         Relationships: []
       }
+      proctor_events: {
+        Row: {
+          attempt_id: string
+          created_at: string
+          id: string
+          kind: string
+          photo_path: string | null
+          student_id: string
+        }
+        Insert: {
+          attempt_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          photo_path?: string | null
+          student_id?: string
+        }
+        Update: {
+          attempt_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          photo_path?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proctor_events_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "attempts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           class: string
