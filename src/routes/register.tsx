@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useHydrated } from "@/lib/use-hydrated";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/AuthCard";
@@ -28,7 +29,8 @@ function Register() {
   const { data: lists } = useLists();
   const [f, setF] = useState({ full_name: "", student_id: "", phone: "", email: "", password: "", confirm: "", class: "" });
   const [busy, setBusy] = useState(false);
-  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
+  const hydrated = useHydrated();
+  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF((prev) => ({ ...prev, [k]: e.target.value }));
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,12 +71,12 @@ function Register() {
         ))}
         <div className="space-y-1.5">
           <Label>Class</Label>
-          <Select value={f.class} onValueChange={(v) => setF({ ...f, class: v })}>
+          <Select value={f.class} onValueChange={(v) => setF((prev) => ({ ...prev, class: v }))}>
             <SelectTrigger className="h-12 text-base"><SelectValue placeholder="Choose your class" /></SelectTrigger>
             <SelectContent>{(lists?.classes ?? []).map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
-        <Button type="submit" disabled={busy} className="h-12 w-full text-base">
+        <Button type="submit" disabled={busy || !hydrated} className="h-12 w-full text-base">
           {busy ? "Creating..." : "Create Account"}
         </Button>
         <p className="text-center text-sm text-muted-foreground">
