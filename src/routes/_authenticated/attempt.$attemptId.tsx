@@ -18,7 +18,8 @@ export const Route = createFileRoute("/_authenticated/attempt/$attemptId")({
   component: Attempt,
 });
 
-type Q = { id: string; type: "mcq" | "true_false" | "short" | "written"; text: string; options: string[]; marks: number };
+type Opt = { text: string; value: string };
+type Q = { id: string; type: "mcq" | "true_false" | "short" | "written"; text: string; options: Opt[]; marks: number };
 type AttemptData = {
   id: string; status: string; deadline: string; server_now: string; answers: Record<string, string>;
   test: { title: string; subject: string }; questions: Q[];
@@ -108,7 +109,7 @@ function Runner({ data }: { data: AttemptData }) {
   const answered = qs.filter((x) => (answers[x.id] ?? "").trim() !== "").length;
   const mm = Math.floor(left / 60000), ss = Math.floor((left % 60000) / 1000);
   const setA = (v: string) => setAnswers((a) => ({ ...a, [q!.id]: v }));
-  const opts = q?.type === "true_false" ? ["True", "False"] : q?.options ?? [];
+  const opts = q?.options ?? [];
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -146,17 +147,16 @@ function Runner({ data }: { data: AttemptData }) {
             <h2 className="mt-2 whitespace-pre-wrap font-sans text-xl font-bold leading-snug tracking-normal">{q.text}</h2>
             <div className="mt-5 space-y-3">
               {(q.type === "mcq" || q.type === "true_false") && opts.map((o, i) => {
-                const val = q.type === "mcq" ? String.fromCharCode(65 + i) : o;
-                const sel = answers[q.id] === val;
+                const sel = answers[q.id] === o.value;
                 return (
-                  <button key={i} onClick={() => setA(val)}
+                  <button key={o.value} onClick={() => setA(o.value)}
                     className={cn("flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left text-base transition",
                       sel ? "border-primary bg-primary/10" : "border-border bg-background hover:border-primary/40")}>
                     <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 font-bold",
                       sel ? "border-primary bg-primary text-primary-foreground" : "border-input")}>
-                      {sel ? <Check className="h-4 w-4" /> : q.type === "mcq" ? val : ""}
+                      {sel ? <Check className="h-4 w-4" /> : q.type === "mcq" ? String.fromCharCode(65 + i) : ""}
                     </span>
-                    {o}
+                    {o.text}
                   </button>
                 );
               })}

@@ -10,6 +10,7 @@ import { useLists } from "@/lib/auth";
 export type TestValues = {
   title: string; subject: string; class: string; instructions: string; attempts_allowed: number;
   duration_minutes: number; pass_percentage: number; start_at: string | null; end_at: string | null; show_results: boolean;
+  shuffle_questions: boolean; shuffle_options: boolean; draw_count: number | null;
 };
 
 const toLocal = (iso: string | null) => {
@@ -20,7 +21,7 @@ const toLocal = (iso: string | null) => {
 };
 const fromLocal = (d: string, t: string) => (d ? new Date(`${d}T${t || "00:00"}`).toISOString() : null);
 
-export function TestForm({ initial, onSubmit, submitLabel }: { initial?: Partial<TestValues>; onSubmit: (v: TestValues) => Promise<void> | void; submitLabel: string }) {
+export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { initial?: Partial<TestValues>; onSubmit: (v: TestValues) => Promise<void> | void; submitLabel: string; questionCount?: number }) {
   const { data: lists } = useLists();
   const s = toLocal(initial?.start_at ?? null), e = toLocal(initial?.end_at ?? null);
   const [v, setV] = useState({
@@ -28,10 +29,15 @@ export function TestForm({ initial, onSubmit, submitLabel }: { initial?: Partial
     instructions: initial?.instructions ?? "", duration_minutes: initial?.duration_minutes ?? 30,
     pass_percentage: initial?.pass_percentage ?? 50, show_results: initial?.show_results ?? true,
     attempts_allowed: initial?.attempts_allowed ?? 1,
+    shuffle_questions: initial?.shuffle_questions ?? false,
+    shuffle_options: initial?.shuffle_options ?? false,
+    draw_count: initial?.draw_count == null ? "" : String(initial.draw_count),
     sd: s.d, st: s.t, ed: e.d, et: e.t,
   });
   const [busy, setBusy] = useState(false);
   const up = (k: string) => (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setV({ ...v, [k]: ev.target.value });
+  const drawn = Number(v.draw_count) > 0 ? Number(v.draw_count) : null;
+  const tooMany = drawn != null && questionCount != null && drawn > questionCount;
 
   return (
     <form className="grid gap-4 sm:grid-cols-2" onSubmit={async (ev) => {
@@ -41,6 +47,7 @@ export function TestForm({ initial, onSubmit, submitLabel }: { initial?: Partial
         title: v.title.trim(), subject: v.subject, class: v.class === "__all" ? "" : v.class, instructions: v.instructions,
         duration_minutes: Number(v.duration_minutes) || 30, pass_percentage: Number(v.pass_percentage) || 50,
         attempts_allowed: Math.max(1, Number(v.attempts_allowed) || 1),
+        shuffle_questions: v.shuffle_questions, shuffle_options: v.shuffle_options, draw_count: drawn,
         show_results: v.show_results, start_at: fromLocal(v.sd, v.st), end_at: fromLocal(v.ed, v.et),
       });
       setBusy(false);
@@ -70,11 +77,35 @@ export function TestForm({ initial, onSubmit, submitLabel }: { initial?: Partial
       <F label="Start Time"><Input type="time" value={v.st} onChange={up("st")} /></F>
       <F label="End Date (optional)"><Input type="date" value={v.ed} onChange={up("ed")} /></F>
       <F label="End Time"><Input type="time" value={v.et} onChange={up("et")} /></F>
+
+      <div className="space-y-4 rounded-2xl border bg-muted/40 p-4 sm:col-span-2">
+        <div>
+          <p className="font-bold">Question Order (JAMB style)</p>
+          <p className="text-sm text-muted-foreground">Every student gets their own copy of the test. Nobody can copy from a neighbour.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Switch id="sq" checked={v.shuffle_questions} onCheckedChange={(c) => setV({ ...v, shuffle_questions: c })} />
+          <Label htmlFor="sq" className="cursor-pointer font-normal">Shuffle the question order for each student</Label>
+        </div>
+        <div className="flex items-center gap-3">
+          <Switch id="so" checked={v.shuffle_options} onCheckedChange={(c) => setV({ ...v, shuffle_options: c })} />
+          <Label htmlFor="so" className="cursor-pointer font-normal">Shuffle the answer options (A, B, C, D) for each student</Label>
+        </div>
+        <F label="Questions to give each student (leave empty to use all)">
+          <Input type="number" min={1} value={v.draw_count} onChange={up("draw_count")} placeholder="e.g. 20" className="max-w-40" />
+        </F>
+        {tooMany && <p className="text-sm font-bold text-destructive">This test has {questionCount} questions, so {drawn} cannot be drawn. Add more questions or lower this number.</p>}
+        {!tooMany && drawn != null && questionCount != null && drawn < questionCount && (
+          <p className="text-sm text-muted-foreground">Each student will get {drawn} questions chosen at random from your {questionCount}.</p>
+        )}
+        <p className="text-xs text-muted-foreground">The number of questions and total marks shown to students update automatically.</p>
+      </div>
+
       <div className="flex items-center gap-3 sm:col-span-2">
         <Switch checked={v.show_results} onCheckedChange={(c) => setV({ ...v, show_results: c })} id="sr" />
         <Label htmlFor="sr">Show results to students immediately after submitting</Label>
       </div>
-      <div className="sm:col-span-2"><Button disabled={busy || !v.subject} className="h-11">{busy ? "Saving..." : submitLabel}</Button></div>
+      <div className="sm:col-span-2"><Button disabled={busy || !v.subject || tooMany} className="h-11">{busy ? "Saving..." : submitLabel}</Button></div>
     </form>
   );
 }
