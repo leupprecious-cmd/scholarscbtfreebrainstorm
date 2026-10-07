@@ -11,6 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TestForm } from "@/components/TestForm";
+import { ImportQuestions } from "@/components/ImportQuestions";
+import { fetchAll } from "@/lib/admin-data";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -27,12 +29,15 @@ function EditTest() {
   const test = useQuery({ queryKey: ["admin-test", testId], queryFn: async () => (await supabase.from("tests").select("*").eq("id", testId).single()).data });
   const qs = useQuery({
     queryKey: ["admin-test-qs", testId],
-    queryFn: async () => (await supabase.from("questions").select("*").eq("test_id", testId).order("position").order("created_at")).data ?? [],
+    queryFn: () => fetchAll<Question>((from, to) =>
+      supabase.from("questions").select("*").eq("test_id", testId).order("position").order("created_at").range(from, to)),
   });
   const [editing, setEditing] = useState<Question | "new" | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const t = test.data;
   if (!t) return <p>Loading...</p>;
   const questions = qs.data ?? [];
+  const shown = showAll ? questions : questions.slice(0, 50);
   const total = questions.reduce((s, q) => s + Number(q.marks), 0);
   const drawn = t.draw_count && t.draw_count < questions.length ? t.draw_count : questions.length;
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin-test-qs", testId] }); qc.invalidateQueries({ queryKey: ["admin-tests"] }); };
@@ -71,7 +76,7 @@ function EditTest() {
         </TabsList>
 
         <TabsContent value="questions" className="mt-4 space-y-3">
-          {questions.map((q, i) => editing !== "new" && editing?.id === q.id ? (
+          {shown.map((q, i) => editing !== "new" && editing?.id === q.id ? (
             <QuestionEditor key={q.id} testId={testId} q={q} position={q.position} onDone={() => { setEditing(null); refresh(); }} />
           ) : (
             <div key={q.id} className="rounded-2xl border bg-card p-4">
@@ -91,10 +96,18 @@ function EditTest() {
               </div>
             </div>
           ))}
+          {questions.length > shown.length && !editing && (
+            <Button variant="outline" className="h-12 w-full border-dashed" onClick={() => setShowAll(true)}>
+              Show all {questions.length} questions
+            </Button>
+          )}
           {editing === "new" ? (
             <QuestionEditor testId={testId} position={questions.length + 1} onDone={() => { setEditing(null); refresh(); }} onSaveAnother={refresh} />
           ) : (
-            <Button variant="outline" className="h-12 w-full border-dashed" onClick={() => setEditing("new")}><Plus className="mr-1 h-4 w-4" />Add Question</Button>
+            <div className="space-y-3">
+              <Button variant="outline" className="h-12 w-full border-dashed" onClick={() => setEditing("new")}><Plus className="mr-1 h-4 w-4" />Add Question</Button>
+              <ImportQuestions testId={testId} position={questions.length + 1} onDone={refresh} />
+            </div>
           )}
         </TabsContent>
 
