@@ -21,9 +21,11 @@ function QuestionBank() {
   const [type, setType] = useState("all");
   const [subject, setSubject] = useState("all");
   const [target, setTarget] = useState("");
+  const [showAll, setShowAll] = useState(false);
   const { data } = useQuery({
     queryKey: ["admin-questions"],
-    queryFn: async () => (await supabase.from("questions").select("*, tests(id,title,subject)").order("created_at", { ascending: false })).data ?? [],
+    queryFn: () => fetchAll((from, to) =>
+      supabase.from("questions").select("*, tests(id,title,subject)").order("created_at", { ascending: false }).range(from, to)),
   });
   const tests = useQuery({ queryKey: ["admin-tests-lite"], queryFn: async () => (await supabase.from("tests").select("id,title").order("created_at", { ascending: false })).data ?? [] });
   const subjects = [...new Set((data ?? []).map((x) => x.tests?.subject).filter(Boolean))] as string[];
