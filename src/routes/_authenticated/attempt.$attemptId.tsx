@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/attempt/$attemptId")({
-  head: () => ({ meta: [{ title: "Taking Test — Online Lesson Test" }] }),
+  head: () => ({ meta: [{ title: "Taking Test — SCHOLARS CBT" }] }),
   component: Attempt,
 });
 

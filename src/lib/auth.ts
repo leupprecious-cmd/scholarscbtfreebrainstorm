@@ -1,12 +1,39 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+export type GradeBand = { grade: string; min: number };
+export const DEFAULT_SCALE: GradeBand[] = [
+  { grade: "A", min: 90 }, { grade: "B", min: 80 }, { grade: "C", min: 70 },
+  { grade: "D", min: 60 }, { grade: "E", min: 50 }, { grade: "F", min: 0 },
+];
+
 export function useSettings() {
   return useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
       const { data } = await supabase.from("app_settings").select("*").eq("id", 1).maybeSingle();
-      return data ?? { id: 1, lesson_name: "My Lesson", show_rankings: false };
+      return {
+        lesson_name: data?.lesson_name ?? "SCHOLARS CBT",
+        grade_scale: ((data?.grade_scale as GradeBand[] | null) ?? DEFAULT_SCALE),
+      };
+    },
+  });
+}
+
+export function gradeFor(percent: number, scale: GradeBand[] = DEFAULT_SCALE) {
+  const sorted = [...scale].sort((a, b) => b.min - a.min);
+  return sorted.find((b) => percent >= b.min)?.grade ?? sorted[sorted.length - 1]?.grade ?? "";
+}
+
+export function useLists() {
+  return useQuery({
+    queryKey: ["lists"],
+    queryFn: async () => {
+      const [s, c] = await Promise.all([
+        supabase.from("subjects").select("*").order("name"),
+        supabase.from("classes").select("*").order("name"),
+      ]);
+      return { subjects: s.data ?? [], classes: c.data ?? [] };
     },
   });
 }

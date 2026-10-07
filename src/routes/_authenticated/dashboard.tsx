@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { pct, useMe } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "My Dashboard — Online Lesson Test" }] }),
+  head: () => ({ meta: [{ title: "My Dashboard — SCHOLARS CBT" }] }),
   component: Dashboard,
 });
 

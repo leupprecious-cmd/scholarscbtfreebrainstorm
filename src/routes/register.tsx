@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Create Student Account — Online Lesson Test" },
+      { title: "Create Student Account — SCHOLARS CBT" },
       { name: "description", content: "Register as a student to take your online lesson tests." },
       { property: "og:title", content: "Create Student Account" },
       { property: "og:description", content: "Register as a student to take your online lesson tests." },

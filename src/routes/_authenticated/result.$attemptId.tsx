@@ -7,7 +7,7 @@ import { pct, useMe } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/result/$attemptId")({
-  head: () => ({ meta: [{ title: "My Result — Online Lesson Test" }] }),
+  head: () => ({ meta: [{ title: "My Result — SCHOLARS CBT" }] }),
   component: Result,
 });
 

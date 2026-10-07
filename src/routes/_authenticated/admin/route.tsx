@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
     const ok = await getIsAdmin(context.user.id);
     if (!ok) throw redirect({ to: "/dashboard" });
   },
-  head: () => ({ meta: [{ title: "Admin — Online Lesson Test" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin — SCHOLARS CBT" }, { name: "robots", content: "noindex" }] }),
   component: AdminLayout,
 });
 
