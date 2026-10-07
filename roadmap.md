@@ -11,3 +11,6 @@
 - [x] Finish browser verification of JAMB randomisation + immediate results
 - [x] Bulk question import (paste or file upload) so large banks (e.g. 1000 questions) can be loaded at once
 - [x] Paginate/limit question lists so 1000-row tests stay fast in admin pages
+- [x] Continuous exam recording (30s clips) + near-live view in Live Monitor
+- [x] Admin notification bell (start/submit/tab switch/camera off) + Gmail digest when admin is away
+- [x] Messages to students (all / class / one student) on dashboard

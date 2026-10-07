@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AlertTriangle, Camera, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ProctorReview } from "@/components/Proctor";
+import { LiveView, ProctorReview } from "@/components/Proctor";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/live")({
@@ -24,7 +24,7 @@ function LiveMonitor() {
   const [tick, setTick] = useState(0);
   const { data, isFetching, refetch } = useQuery({
     queryKey: ["admin-live"],
-    refetchInterval: 20000,
+    refetchInterval: 10000,
     queryFn: async () => {
       const rows = (await supabase.rpc("admin_live_attempts")).data ?? [];
       const paths = rows.map((r) => r.last_photo).filter((p): p is string => !!p);
@@ -42,7 +42,7 @@ function LiveMonitor() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold">Live Monitor</h1>
-          <p className="text-sm text-muted-foreground">Students writing an exam right now. Updates every 20 seconds.</p>
+          <p className="text-sm text-muted-foreground">Students writing an exam right now. Cards update every 10 seconds; the selected student updates every few seconds. Every exam is recorded so you can replay it later from Results.</p>
         </div>
         <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
           <RefreshCw className={cn("mr-2 h-4 w-4", isFetching && "animate-spin")} />Refresh
@@ -87,8 +87,7 @@ function LiveMonitor() {
               <>
                 <p className="font-bold">{current.full_name}</p>
                 <p className="mb-3 text-xs text-muted-foreground">{current.test_title}</p>
-                {current.url && <img src={current.url} alt="Latest photo" className="mb-1 w-full rounded-xl object-cover" />}
-                {current.last_photo_at && <p className="mb-4 text-xs text-muted-foreground">Latest photo at {new Date(current.last_photo_at).toLocaleTimeString()}</p>}
+                <div className="mb-4"><LiveView key={current.attempt_id} attemptId={current.attempt_id} /></div>
                 <ProctorReview key={`${current.attempt_id}-${tick}`} attemptId={current.attempt_id} />
               </>
             )}
