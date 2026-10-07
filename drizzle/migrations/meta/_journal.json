@@ -43,6 +43,13 @@
       "when": 1791408331135,
       "tag": "0005_fix_question_shuffle",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791410070609,
+      "tag": "0006_corrections_and_live_monitor",
+      "breakpoints": true
     }
   ]
 }
