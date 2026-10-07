@@ -126,7 +126,7 @@ export function ProctorReview({ attemptId }: { attemptId: string }) {
       {photos.length === 0 ? <p className="mt-3 text-sm text-muted-foreground">No photos recorded for this attempt.</p> : (
         <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
           {photos.map((p) => (
-            <a key={p.id} href={p.url} target="_blank" rel="noreferrer" className="block">
+            <a key={p.id} href={p.url ?? undefined} target="_blank" rel="noreferrer" className="block">
               {p.url && <img src={p.url} alt="Exam photo" className="aspect-[4/3] w-full rounded-lg object-cover" />}
               <p className="text-center text-[11px] text-muted-foreground">{new Date(p.created_at).toLocaleTimeString()}</p>
             </a>
