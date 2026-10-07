@@ -38,6 +38,7 @@ export type Database = {
       attempts: {
         Row: {
           answers: Json
+          chosen_subjects: string[]
           correct_count: number
           deadline: string
           delivery: Json
@@ -56,6 +57,7 @@ export type Database = {
         }
         Insert: {
           answers?: Json
+          chosen_subjects?: string[]
           correct_count?: number
           deadline: string
           delivery?: Json
@@ -74,6 +76,7 @@ export type Database = {
         }
         Update: {
           answers?: Json
+          chosen_subjects?: string[]
           correct_count?: number
           deadline?: string
           delivery?: Json
@@ -156,6 +159,7 @@ export type Database = {
           marks: number
           options: Json
           position: number
+          subject: string
           test_id: string
           text: string
           type: string
@@ -167,6 +171,7 @@ export type Database = {
           marks?: number
           options?: Json
           position?: number
+          subject?: string
           test_id: string
           text: string
           type: string
@@ -178,6 +183,7 @@ export type Database = {
           marks?: number
           options?: Json
           position?: number
+          subject?: string
           test_id?: string
           text?: string
           type?: string
@@ -214,13 +220,18 @@ export type Database = {
         Row: {
           attempts_allowed: number
           class: string
+          compulsory_subjects: string[]
           created_at: string
           draw_count: number | null
           duration_minutes: number
+          elective_subjects: string[]
+          electives_to_pick: number
           end_at: string | null
           id: string
           instructions: string
+          multi_subject: boolean
           pass_percentage: number
+          per_subject_count: number
           show_results: boolean
           shuffle_options: boolean
           shuffle_questions: boolean
@@ -232,13 +243,18 @@ export type Database = {
         Insert: {
           attempts_allowed?: number
           class?: string
+          compulsory_subjects?: string[]
           created_at?: string
           draw_count?: number | null
           duration_minutes?: number
+          elective_subjects?: string[]
+          electives_to_pick?: number
           end_at?: string | null
           id?: string
           instructions?: string
+          multi_subject?: boolean
           pass_percentage?: number
+          per_subject_count?: number
           show_results?: boolean
           shuffle_options?: boolean
           shuffle_questions?: boolean
@@ -250,13 +266,18 @@ export type Database = {
         Update: {
           attempts_allowed?: number
           class?: string
+          compulsory_subjects?: string[]
           created_at?: string
           draw_count?: number | null
           duration_minutes?: number
+          elective_subjects?: string[]
+          electives_to_pick?: number
           end_at?: string | null
           id?: string
           instructions?: string
+          multi_subject?: boolean
           pass_percentage?: number
+          per_subject_count?: number
           show_results?: boolean
           shuffle_options?: boolean
           shuffle_questions?: boolean
@@ -332,6 +353,10 @@ export type Database = {
         Returns: boolean
       }
       start_attempt: { Args: { _test_id: string }; Returns: string }
+      start_attempt_subjects: {
+        Args: { _subjects: string[]; _test_id: string }
+        Returns: string
+      }
       student_tests: {
         Args: never
         Returns: {
@@ -354,6 +379,7 @@ export type Database = {
         Args: { _answers: Json; _attempt_id: string }
         Returns: boolean
       }
+      test_subject_config: { Args: { _test_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "student"
