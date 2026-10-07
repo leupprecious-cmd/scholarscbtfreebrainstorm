@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Clock, Check } from "lucide-react";
+import { Clock, Check, Flag, Eraser } from "lucide-react";
+import { useMe } from "@/lib/auth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/attempt/$attemptId")({
-  head: () => ({ meta: [{ title: "Taking Test — Online Lesson Test" }] }),
+  head: () => ({ meta: [{ title: "Taking Test — SCHOLARS CBT" }] }),
   component: Attempt,
 });
 
@@ -56,6 +57,10 @@ function Runner({ data }: { data: AttemptData }) {
       return { ...data.answers, ...local };
     } catch { return data.answers; }
   });
+  const { data: me } = useMe();
+  const [flags, setFlags] = useState<Record<string, boolean>>({});
+  useEffect(() => { try { setFlags(JSON.parse(localStorage.getItem(storageKey + "-flags") || "{}")); } catch { /* ignore */ } }, [storageKey]);
+  useEffect(() => { localStorage.setItem(storageKey + "-flags", JSON.stringify(flags)); }, [flags, storageKey]);
   const [idx, setIdx] = useState(0);
   const [confirm, setConfirm] = useState(false);
   const [saved, setSaved] = useState(true);
@@ -72,6 +77,7 @@ function Runner({ data }: { data: AttemptData }) {
     const { error } = await supabase.rpc("submit_attempt", { _attempt_id: data.id, _answers: answersRef.current });
     if (error) { submitting.current = false; { toast.error("Could not submit. Check your internet and try again."); return; } }
     localStorage.removeItem(storageKey);
+    localStorage.removeItem(storageKey + "-flags");
     if (auto) toast.info("Time is up! Your test was submitted.");
     navigate({ to: "/result/$attemptId", params: { attemptId: data.id }, replace: true });
   }, [data.id, navigate, storageKey]);
@@ -109,12 +115,13 @@ function Runner({ data }: { data: AttemptData }) {
       <header className="sticky top-0 z-10 border-b bg-card">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <div className="min-w-0">
+            <p className="text-[11px] font-extrabold tracking-widest text-primary">SCHOLARS CBT</p>
             <p className="truncate font-display font-bold">{data.test.title}</p>
-            <p className="text-xs text-muted-foreground">{saved ? "All answers saved" : "Saving..."}</p>
+            <p className="truncate text-xs text-muted-foreground">{me?.profile?.full_name} · {saved ? "All answers saved" : "Saving..."}</p>
           </div>
           <div className={cn("flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-lg font-bold tabular-nums",
             left < 60000 ? "bg-destructive text-destructive-foreground" : left < 300000 ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground")}>
-            <Clock className="h-4 w-4" />{String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
+            <Clock className="h-4 w-4" /><span className="hidden text-xs sm:inline">TIME REMAINING</span> {String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
           </div>
         </div>
       </header>
@@ -124,12 +131,15 @@ function Runner({ data }: { data: AttemptData }) {
           {qs.map((x, i) => (
             <button key={x.id} onClick={() => setIdx(i)}
               className={cn("h-10 w-10 rounded-lg border text-sm font-bold",
-                i === idx ? "border-primary bg-primary text-primary-foreground" : (answers[x.id] ?? "").trim() ? "border-success bg-success/15 text-foreground" : "bg-card")}>
+                i === idx ? "border-primary bg-primary text-primary-foreground" : flags[x.id] ? "border-warning bg-warning text-warning-foreground" : (answers[x.id] ?? "").trim() ? "border-success bg-success text-success-foreground" : "border-border bg-muted text-muted-foreground")}>
               {i + 1}
             </button>
           ))}
         </div>
 
+        <div className="-mt-2 mb-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
+          <Legend c="bg-muted border" l="Unanswered" /><Legend c="bg-success" l="Answered" /><Legend c="bg-warning" l="Flagged" /><Legend c="bg-primary" l="Current" />
+        </div>
         {q ? (
           <div className="rounded-2xl border bg-card p-5 sm:p-7">
             <p className="text-sm font-bold text-muted-foreground">Question {idx + 1} of {qs.length} · {q.marks} mark{Number(q.marks) === 1 ? "" : "s"}</p>
@@ -152,6 +162,14 @@ function Runner({ data }: { data: AttemptData }) {
               })}
               {q.type === "short" && <Input value={answers[q.id] ?? ""} onChange={(e) => setA(e.target.value)} placeholder="Type your answer" className="h-14 text-lg" />}
               {q.type === "written" && <Textarea value={answers[q.id] ?? ""} onChange={(e) => setA(e.target.value)} placeholder="Write your answer" rows={8} className="text-base" />}
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={() => setFlags((f) => ({ ...f, [q.id]: !f[q.id] }))} className={cn(flags[q.id] && "border-warning bg-warning/20")}>
+                <Flag className="mr-1 h-4 w-4" />{flags[q.id] ? "Unflag" : "Flag Question"}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setAnswers((a) => { const n = { ...a }; delete n[q.id]; return n; })}>
+                <Eraser className="mr-1 h-4 w-4" />Clear Answer
+              </Button>
             </div>
           </div>
         ) : <p>This test has no questions.</p>}
@@ -179,16 +197,21 @@ function Runner({ data }: { data: AttemptData }) {
               Are you sure you want to submit your test? You will not be able to change your answers after submission.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="grid grid-cols-2 gap-3 text-center">
+          <div className="grid grid-cols-3 gap-3 text-center">
             <div className="rounded-xl bg-success/15 p-3"><p className="text-2xl font-bold">{answered}</p><p className="text-sm">Answered</p></div>
             <div className="rounded-xl bg-destructive/10 p-3"><p className="text-2xl font-bold">{qs.length - answered}</p><p className="text-sm">Unanswered</p></div>
+            <div className="rounded-xl bg-warning/25 p-3"><p className="text-2xl font-bold">{qs.filter((x) => flags[x.id]).length}</p><p className="text-sm">Flagged</p></div>
           </div>
           <AlertDialogFooter>
-            <Button variant="outline" className="h-12" onClick={() => setConfirm(false)}>Continue Test</Button>
+            <Button variant="outline" className="h-12" onClick={() => setConfirm(false)}>Return to Test</Button>
             <Button className="h-12" onClick={() => submit(false)}>Submit Test</Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
   );
+}
+
+function Legend({ c, l }: { c: string; l: string }) {
+  return <span className="flex items-center gap-1"><span className={cn("h-3 w-3 rounded", c)} />{l}</span>;
 }

@@ -9,7 +9,7 @@ export function useAdminResults() {
       const [a, p, t] = await Promise.all([
         supabase.from("attempts").select("*").order("started_at", { ascending: false }),
         supabase.from("profiles").select("*"),
-        supabase.from("tests").select("id,title,class,pass_percentage"),
+        supabase.from("tests").select("id,title,class,subject,pass_percentage"),
       ]);
       const prof = new Map((p.data ?? []).map((x) => [x.id, x]));
       const tests = new Map((t.data ?? []).map((x) => [x.id, x]));
@@ -23,6 +23,7 @@ export function useAdminResults() {
           student_code: s?.student_id ?? "",
           student_class: s?.class ?? "",
           test_title: test?.title ?? "",
+          subject: test?.subject ?? "",
           percent,
           passed: percent >= (test?.pass_percentage ?? 50),
         };

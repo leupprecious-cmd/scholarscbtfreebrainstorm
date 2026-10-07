@@ -5,7 +5,7 @@ import { LoginForm } from "@/components/LoginForm";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Student Login — Online Lesson Test" },
+      { title: "Student Login — SCHOLARS CBT" },
       { name: "description", content: "Log in to see and take your available tests." },
       { property: "og:title", content: "Student Login" },
       { property: "og:description", content: "Log in to see and take your available tests." },

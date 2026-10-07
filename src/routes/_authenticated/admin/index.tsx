@@ -14,18 +14,19 @@ function AdminHome() {
     queryFn: async () => {
       const [roles, tests, attempts] = await Promise.all([
         supabase.from("user_roles").select("user_id").eq("role", "student"),
-        supabase.from("tests").select("id"),
+        supabase.from("tests").select("id,status"),
         supabase.from("attempts").select("score,total").eq("status", "submitted"),
       ]);
       const a = attempts.data ?? [];
       const avg = a.length ? Math.round(a.reduce((s, x) => s + pct(x.score, x.total), 0) / a.length) : 0;
-      return { students: roles.data?.length ?? 0, tests: tests.data?.length ?? 0, completed: a.length, avg };
+      return { students: roles.data?.length ?? 0, tests: tests.data?.length ?? 0, published: (tests.data ?? []).filter((t) => t.status === "published").length, completed: a.length, avg };
     },
   });
   const cards = [
     ["Total Students", data?.students],
     ["Total Tests", data?.tests],
-    ["Tests Completed", data?.completed],
+    ["Published Tests", data?.published],
+    ["Completed Tests", data?.completed],
     ["Average Score", data ? `${data.avg}%` : undefined],
   ];
   return (
@@ -34,7 +35,7 @@ function AdminHome() {
         <h1 className="text-3xl font-extrabold">Dashboard</h1>
         <Button asChild><Link to="/admin/tests/new">Create New Test</Link></Button>
       </div>
-      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
         {cards.map(([l, v]) => (
           <div key={l} className="rounded-2xl border bg-card p-5">
             <p className="text-sm text-muted-foreground">{l}</p>
