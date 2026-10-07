@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { BarChart3, FileText, LayoutDashboard, ListChecks, LogOut, Settings, Users } from "lucide-react";
+import { BarChart3, FileText, LayoutDashboard, ListChecks, LogOut, Radio, Settings, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getIsAdmin } from "@/lib/auth";
 
@@ -18,6 +18,7 @@ const nav = [
   { to: "/admin/tests", label: "Tests", icon: FileText, exact: false },
   { to: "/admin/questions", label: "Questions", icon: ListChecks, exact: false },
   { to: "/admin/students", label: "Students", icon: Users, exact: false },
+  { to: "/admin/live", label: "Live Monitor", icon: Radio, exact: false },
   { to: "/admin/results", label: "Results", icon: BarChart3, exact: false },
   { to: "/admin/settings", label: "Settings", icon: Settings, exact: false },
 ] as const;
