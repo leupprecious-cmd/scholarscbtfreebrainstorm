@@ -68,6 +68,7 @@ export function ImportQuestions({ testId, position, onDone }: { testId: string; 
     }
     setBusy(false);
     toast.success(`${done} question${done === 1 ? "" : "s"} added${result?.problems.length ? ` — ${result.problems.length} item${result.problems.length === 1 ? "" : "s"} needs your attention` : ""}`);
+    setOpen(false);
     setResult(null); setRaw(""); setFile(""); setAdded(0);
     onDone();
   }
