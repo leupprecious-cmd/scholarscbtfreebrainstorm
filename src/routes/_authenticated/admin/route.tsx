@@ -1,8 +1,9 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { BarChart3, FileText, LayoutDashboard, ListChecks, LogOut, Radio, Settings, Users } from "lucide-react";
+import { BarChart3, Megaphone, FileText, LayoutDashboard, ListChecks, LogOut, Radio, Settings, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getIsAdmin } from "@/lib/auth";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ context }) => {
@@ -19,6 +20,7 @@ const nav = [
   { to: "/admin/questions", label: "Questions", icon: ListChecks, exact: false },
   { to: "/admin/students", label: "Students", icon: Users, exact: false },
   { to: "/admin/live", label: "Live Monitor", icon: Radio, exact: false },
+  { to: "/admin/messages", label: "Messages", icon: Megaphone, exact: false },
   { to: "/admin/results", label: "Results", icon: BarChart3, exact: false },
   { to: "/admin/settings", label: "Settings", icon: Settings, exact: false },
 ] as const;
@@ -40,6 +42,7 @@ function AdminLayout() {
           <p className="font-display text-lg font-extrabold">SCHOLARS CBT</p>
         </div>
         <nav className="flex gap-1 overflow-x-auto px-2 pb-3 md:flex-col md:overflow-visible">
+          <NotificationBell />
           {nav.map((n) => (
             <Link key={n.to} to={n.to} activeOptions={{ exact: n.exact }}
               className="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold hover:bg-sidebar-accent"

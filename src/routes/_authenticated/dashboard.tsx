@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, type ReactNode } from "react";
 import { CalendarClock, Clock, FileQuestion, GraduationCap } from "lucide-react";
 import { StudentShell } from "@/components/StudentShell";
+import { Announcements } from "@/components/Announcements";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { gradeFor, pct, useMe, useSettings } from "@/lib/auth";
@@ -39,6 +40,8 @@ function Dashboard() {
         <h1 className="text-3xl font-extrabold">{me?.profile?.full_name || "Student"}</h1>
         <p className="mt-1 text-sm opacity-80">{me?.profile?.class}{me?.profile?.student_id && ` · ${me.profile.student_id}`}</p>
       </div>
+
+      <Announcements />
 
       <Section title="Available Tests" empty="No tests available right now.">
         {available.map((t) => (
