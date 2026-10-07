@@ -13,6 +13,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Proctor } from "@/components/Proctor";
+import { GiftCard } from "@/components/GiftCard";
 import { Calculator } from "@/components/Calculator";
 import { flushAdminEmails } from "@/lib/notify.functions";
 
@@ -55,7 +56,7 @@ function Attempt() {
 function ProctoredRunner({ data }: { data: AttemptData }) {
   const { data: me } = useMe();
   if (!me) return <div className="p-8 text-center">Loading test...</div>;
-  return <Proctor attemptId={data.id} studentId={me.user.id}><Runner data={data} /></Proctor>;
+  return <Proctor attemptId={data.id} studentId={me.user.id}><GiftCard attemptId={data.id}><Runner data={data} /></GiftCard></Proctor>;
 }
 
 function Runner({ data }: { data: AttemptData }) {
