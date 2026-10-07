@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAll } from "@/lib/admin-data";
 
 export const Route = createFileRoute("/_authenticated/admin/questions")({
   component: QuestionBank,
@@ -28,6 +29,7 @@ function QuestionBank() {
   const subjects = [...new Set((data ?? []).map((x) => x.tests?.subject).filter(Boolean))] as string[];
   const rows = (data ?? []).filter((x) =>
     x.text.toLowerCase().includes(q.toLowerCase()) && (type === "all" || x.type === type) && (subject === "all" || x.tests?.subject === subject));
+  const shown = showAll ? rows : rows.slice(0, 50);
 
   async function reuse(id: string) {
     if (!target) { toast.error("Choose a test to copy into first"); return; }
@@ -69,7 +71,7 @@ function QuestionBank() {
         </Select>
       </div>
       <div className="mt-4 space-y-2">
-        {rows.map((x) => (
+        {shown.map((x) => (
           <div key={x.id} className="flex items-start justify-between gap-3 rounded-xl border bg-card p-4">
             <div>
               <p className="font-bold">{x.text}</p>
@@ -85,6 +87,9 @@ function QuestionBank() {
           </div>
         ))}
         {rows.length === 0 && <p className="text-muted-foreground">No questions found.</p>}
+        {rows.length > shown.length && (
+          <Button variant="outline" className="w-full border-dashed" onClick={() => setShowAll(true)}>Show more ({rows.length - shown.length} left)</Button>
+        )}
       </div>
     </div>
   );
