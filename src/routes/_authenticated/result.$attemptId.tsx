@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { gradeFor, pct, useMe, useSettings } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { Corrections } from "@/components/Corrections";
 
 export const Route = createFileRoute("/_authenticated/result/$attemptId")({
   head: () => ({ meta: [{ title: "My Result — SCHOLARS CBT" }] }),
@@ -52,6 +53,7 @@ function Result() {
           </>
         )}
         {r.submitted_at && <p className="mt-6 text-sm text-muted-foreground">Submitted at {new Date(r.submitted_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</p>}
+        <Corrections attemptId={attemptId} />
         <Button asChild className="mt-6 h-12 w-full sm:w-auto sm:px-10"><Link to="/dashboard">Back to Dashboard</Link></Button>
       </div>
     </StudentShell>

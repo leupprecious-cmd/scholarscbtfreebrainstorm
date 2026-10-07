@@ -267,6 +267,7 @@ export type Database = {
           multi_subject: boolean
           pass_percentage: number
           per_subject_count: number
+          show_corrections: boolean
           show_results: boolean
           shuffle_options: boolean
           shuffle_questions: boolean
@@ -290,6 +291,7 @@ export type Database = {
           multi_subject?: boolean
           pass_percentage?: number
           per_subject_count?: number
+          show_corrections?: boolean
           show_results?: boolean
           shuffle_options?: boolean
           shuffle_questions?: boolean
@@ -313,6 +315,7 @@ export type Database = {
           multi_subject?: boolean
           pass_percentage?: number
           per_subject_count?: number
+          show_corrections?: boolean
           show_results?: boolean
           shuffle_options?: boolean
           shuffle_questions?: boolean
@@ -347,6 +350,25 @@ export type Database = {
     }
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
+      admin_live_attempts: {
+        Args: never
+        Returns: {
+          answered: number
+          attempt_id: string
+          camera_off: number
+          class: string
+          deadline: string
+          full_name: string
+          last_photo: string
+          last_photo_at: string
+          photos: number
+          started_at: string
+          student_id: string
+          tab_switches: number
+          test_title: string
+          total_questions: number
+        }[]
+      }
       admin_reset_attempt: { Args: { _attempt_id: string }; Returns: undefined }
       build_delivery: { Args: { _attempt_id: string }; Returns: Json }
       claim_admin: { Args: never; Returns: boolean }
@@ -363,6 +385,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_corrections: { Args: { _attempt_id: string }; Returns: Json }
       my_results: {
         Args: never
         Returns: {
