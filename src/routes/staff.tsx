@@ -43,6 +43,7 @@ function Setup() {
   const navigate = useNavigate();
   const [f, setF] = useState({ name: "", email: "", password: "" });
   const [busy, setBusy] = useState(false);
+  const hydrated = useHydrated();
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
