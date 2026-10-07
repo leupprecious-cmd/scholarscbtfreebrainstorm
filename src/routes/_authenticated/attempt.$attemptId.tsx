@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { Proctor } from "@/components/Proctor";
 
 export const Route = createFileRoute("/_authenticated/attempt/$attemptId")({
   head: () => ({ meta: [{ title: "Taking Test — SCHOLARS CBT" }] }),
@@ -46,7 +47,13 @@ function Attempt() {
   if (isLoading) return <div className="p-8 text-center">Loading test...</div>;
   if (error || !data) return <div className="p-8 text-center">Could not load this test.</div>;
   if (data.status !== "in_progress") return null;
-  return <Runner data={data} />;
+  return <ProctoredRunner data={data} />;
+}
+
+function ProctoredRunner({ data }: { data: AttemptData }) {
+  const { data: me } = useMe();
+  if (!me) return <div className="p-8 text-center">Loading test...</div>;
+  return <Proctor attemptId={data.id} studentId={me.user.id}><Runner data={data} /></Proctor>;
 }
 
 function Runner({ data }: { data: AttemptData }) {

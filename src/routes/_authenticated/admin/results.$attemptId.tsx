@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminResults } from "@/lib/admin-data";
 import { cn } from "@/lib/utils";
+import { ProctorReview } from "@/components/Proctor";
 
 export const Route = createFileRoute("/_authenticated/admin/results/$attemptId")({
   component: ResultDetail,
@@ -45,6 +46,9 @@ function ResultDetail() {
           <div key={String(k)} className="rounded-xl border bg-card p-3"><p className="text-xs text-muted-foreground">{k}</p><p className="text-xl font-bold">{v}</p></div>
         ))}
       </div>
+
+      <h2 className="mt-8 text-xl font-bold">Exam supervision</h2>
+      <div className="mt-3 rounded-2xl border bg-card p-4"><ProctorReview attemptId={r.id} /></div>
 
       <h2 className="mt-8 text-xl font-bold">Submitted answers</h2>
       <div className="mt-3 space-y-3">
