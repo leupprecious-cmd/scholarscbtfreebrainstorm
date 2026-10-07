@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Proctor } from "@/components/Proctor";
 import { Calculator } from "@/components/Calculator";
+import { flushAdminEmails } from "@/lib/notify.functions";
 
 export const Route = createFileRoute("/_authenticated/attempt/$attemptId")({
   head: () => ({ meta: [{ title: "Taking Test — SCHOLARS CBT" }] }),
@@ -85,6 +86,7 @@ function Runner({ data }: { data: AttemptData }) {
     submitting.current = true;
     const { error } = await supabase.rpc("submit_attempt", { _attempt_id: data.id, _answers: answersRef.current });
     if (error) { submitting.current = false; { toast.error("Could not submit. Check your internet and try again."); return; } }
+    void flushAdminEmails().catch(() => {});
     localStorage.removeItem(storageKey);
     localStorage.removeItem(storageKey + "-flags");
     if (auto) toast.info("Time is up! Your test was submitted.");
