@@ -22,7 +22,7 @@ function TestsList() {
   async function del(id: string) {
     if (!confirm("Delete this test, its questions and all results? This cannot be undone.")) return;
     const { error } = await supabase.from("tests").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["admin-tests"] });
   }
   return (

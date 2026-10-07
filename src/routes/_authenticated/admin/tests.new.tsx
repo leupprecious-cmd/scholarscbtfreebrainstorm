@@ -15,7 +15,7 @@ function NewTest() {
       <div className="mt-6 rounded-2xl border bg-card p-6">
         <TestForm submitLabel="Add Questions →" onSubmit={async (v) => {
           const { data, error } = await supabase.from("tests").insert(v).select("id").single();
-          if (error) return void toast.error(error.message);
+          if (error) { toast.error(error.message); return; }
           navigate({ to: "/admin/tests/$testId", params: { testId: data.id } });
         }} />
       </div>

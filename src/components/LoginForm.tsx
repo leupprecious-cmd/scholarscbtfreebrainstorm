@@ -19,13 +19,13 @@ export function LoginForm({ mode }: { mode: "student" | "admin" }) {
     const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     if (error) {
       setBusy(false);
-      return toast.error(error.message);
+      { toast.error(error.message); return; }
     }
     const admin = await getIsAdmin(data.user.id);
     setBusy(false);
     if (mode === "admin" && !admin) {
       await supabase.auth.signOut();
-      return toast.error("This account is not an administrator.");
+      { toast.error("This account is not an administrator."); return; }
     }
     navigate({ to: admin ? "/admin" : "/dashboard" });
   }

@@ -70,7 +70,7 @@ function Runner({ data }: { data: AttemptData }) {
     if (submitting.current) return;
     submitting.current = true;
     const { error } = await supabase.rpc("submit_attempt", { _attempt_id: data.id, _answers: answersRef.current });
-    if (error) { submitting.current = false; return toast.error("Could not submit. Check your internet and try again."); }
+    if (error) { submitting.current = false; { toast.error("Could not submit. Check your internet and try again."); return; } }
     localStorage.removeItem(storageKey);
     if (auto) toast.info("Time is up! Your test was submitted.");
     navigate({ to: "/result/$attemptId", params: { attemptId: data.id }, replace: true });
@@ -101,7 +101,7 @@ function Runner({ data }: { data: AttemptData }) {
   const q = qs[idx];
   const answered = qs.filter((x) => (answers[x.id] ?? "").trim() !== "").length;
   const mm = Math.floor(left / 60000), ss = Math.floor((left % 60000) / 1000);
-  const setA = (v: string) => setAnswers((a) => ({ ...a, [q.id]: v }));
+  const setA = (v: string) => setAnswers((a) => ({ ...a, [q!.id]: v }));
   const opts = q?.type === "true_false" ? ["True", "False"] : q?.options ?? [];
 
   return (

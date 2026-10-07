@@ -25,7 +25,7 @@ function Instructions() {
     setBusy(true);
     const { data: id, error } = await supabase.rpc("start_attempt", { _test_id: testId });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     navigate({ to: "/attempt/$attemptId", params: { attemptId: id as string } });
   }
 

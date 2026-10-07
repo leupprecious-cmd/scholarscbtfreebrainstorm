@@ -47,14 +47,14 @@ function Setup() {
     e.preventDefault();
     setBusy(true);
     let { data, error } = await supabase.auth.signUp({ email: f.email.trim(), password: f.password, options: { data: { full_name: f.name } } });
-    if (error) { setBusy(false); return toast.error(error.message); }
+    if (error) { setBusy(false); { toast.error(error.message); return; } }
     if (!data.session) {
       const r = await supabase.auth.signInWithPassword({ email: f.email.trim(), password: f.password });
-      if (r.error) { setBusy(false); return toast.error(r.error.message); }
+      if (r.error) { setBusy(false); { toast.error(r.error.message); return; } }
     }
     const c = await supabase.rpc("claim_admin");
     setBusy(false);
-    if (c.error) return toast.error(c.error.message);
+    if (c.error) { toast.error(c.error.message); return; }
     toast.success("Administrator account created");
     navigate({ to: "/admin" });
   }

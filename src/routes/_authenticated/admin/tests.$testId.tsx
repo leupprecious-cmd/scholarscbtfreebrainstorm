@@ -37,9 +37,9 @@ function EditTest() {
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin-test-qs", testId] }); qc.invalidateQueries({ queryKey: ["admin-tests"] }); };
 
   async function setStatus(status: string) {
-    if (status === "published" && questions.length === 0) return toast.error("Add at least one question first");
+    if (status === "published" && questions.length === 0) { toast.error("Add at least one question first"); return; }
     const { error } = await supabase.from("tests").update({ status }).eq("id", testId);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(status === "published" ? "Test published! Students can now see it." : status === "closed" ? "Test closed" : "Saved as draft");
     qc.invalidateQueries({ queryKey: ["admin-test", testId] });
     qc.invalidateQueries({ queryKey: ["admin-tests"] });
@@ -96,7 +96,7 @@ function EditTest() {
         <TabsContent value="details" className="mt-4 rounded-2xl border bg-card p-6">
           <TestForm key={t.id + t.title} initial={t} submitLabel="Save Details" onSubmit={async (v) => {
             const { error } = await supabase.from("tests").update(v).eq("id", testId);
-            if (error) return void toast.error(error.message);
+            if (error) { toast.error(error.message); return; }
             toast.success("Saved");
             qc.invalidateQueries({ queryKey: ["admin-test", testId] });
           }} />
@@ -133,15 +133,15 @@ function QuestionEditor({ testId, q, position, onDone, onSaveAnother }: { testId
   const [pos, setPos] = useState(position);
 
   async function save(another: boolean) {
-    if (!v.text.trim()) return toast.error("Enter the question");
+    if (!v.text.trim()) { toast.error("Enter the question"); return; }
     const options = v.type === "mcq" ? v.options.map((o) => o.trim()).filter(Boolean) : [];
-    if (v.type === "mcq" && options.length < 2) return toast.error("Add at least two options");
-    if (v.type !== "written" && !v.correct_answer.trim()) return toast.error("Select or enter the correct answer");
+    if (v.type === "mcq" && options.length < 2) { toast.error("Add at least two options"); return; }
+    if (v.type !== "written" && !v.correct_answer.trim()) { toast.error("Select or enter the correct answer"); return; }
     setBusy(true);
     const row = { test_id: testId, type: v.type, text: v.text.trim(), options, correct_answer: v.correct_answer.trim(), marks: Number(v.marks) || 1, position: q ? q.position : pos };
     const { error } = q ? await supabase.from("questions").update(row).eq("id", q.id) : await supabase.from("questions").insert(row);
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Question saved");
     if (another) { setV(blank); setPos(pos + 1); onSaveAnother?.(); } else onDone();
   }

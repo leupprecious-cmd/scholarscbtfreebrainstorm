@@ -29,8 +29,8 @@ function Register() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (f.password.length < 6) return toast.error("Password must be at least 6 characters");
-    if (f.password !== f.confirm) return toast.error("Passwords do not match");
+    if (f.password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    if (f.password !== f.confirm) { toast.error("Passwords do not match"); return; }
     setBusy(true);
     const { data, error } = await supabase.auth.signUp({
       email: f.email.trim(),
@@ -41,8 +41,8 @@ function Register() {
       },
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
-    if (!data.session) return toast.success("Account created. Please log in.");
+    if (error) { toast.error(error.message); return; }
+    if (!data.session) { toast.success("Account created. Please log in."); return; }
     navigate({ to: "/dashboard" });
   }
 

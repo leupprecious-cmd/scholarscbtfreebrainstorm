@@ -30,7 +30,7 @@ function ResultDetail() {
   async function reset() {
     if (!confirm("Delete this attempt so the student can retake the test?")) return;
     const { error } = await supabase.rpc("admin_reset_attempt", { _attempt_id: attemptId });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["admin-results"] });
     navigate({ to: "/admin/results" });
   }
@@ -74,7 +74,7 @@ function ResultDetail() {
   );
 }
 
-function GradeBox({ attemptId, questionId, max, current, onSaved }: { attemptId: string; questionId: string; max: number; current?: number; onSaved: () => void }) {
+function GradeBox({ attemptId, questionId, max, current, onSaved }: { attemptId: string; questionId: string; max: number; current?: number | undefined; onSaved: () => void }) {
   const [m, setM] = useState(current !== undefined ? String(current) : "");
   return (
     <div className="mt-3 flex items-center gap-2">
@@ -83,7 +83,7 @@ function GradeBox({ attemptId, questionId, max, current, onSaved }: { attemptId:
       <Button size="sm" onClick={async () => {
         const n = Math.min(max, Math.max(0, Number(m) || 0));
         const { error } = await supabase.rpc("grade_written", { _attempt_id: attemptId, _question_id: questionId, _marks: n });
-        if (error) return toast.error(error.message);
+        if (error) { toast.error(error.message); return; }
         toast.success("Mark saved");
         onSaved();
       }}>Save mark</Button>
