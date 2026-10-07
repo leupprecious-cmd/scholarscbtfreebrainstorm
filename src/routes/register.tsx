@@ -74,7 +74,7 @@ function Register() {
             <SelectContent>{(lists?.classes ?? []).map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
-        <Button type="submit" disabled={busy} className="h-12 w-full text-base">
+        <Button type="submit" disabled={busy || !hydrated} className="h-12 w-full text-base">
           {busy ? "Creating..." : "Create Account"}
         </Button>
         <p className="text-center text-sm text-muted-foreground">

@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useHydrated } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ export function LoginForm({ mode }: { mode: "student" | "admin" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const hydrated = useHydrated();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,7 +42,7 @@ export function LoginForm({ mode }: { mode: "student" | "admin" }) {
         <Label htmlFor="password">Password</Label>
         <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 text-base" />
       </div>
-      <Button type="submit" disabled={busy} className="h-12 w-full text-base">
+      <Button type="submit" disabled={busy || !hydrated} className="h-12 w-full text-base">
         {busy ? "Signing in..." : "Log In"}
       </Button>
     </form>
