@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { StudentShell } from "@/components/StudentShell";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { pct, useMe } from "@/lib/auth";
+import { gradeFor, pct, useMe, useSettings } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/result/$attemptId")({
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/result/$attemptId")({
 function Result() {
   const { attemptId } = Route.useParams();
   const { data: me } = useMe();
+  const { data: settings } = useSettings();
   const { data, isLoading } = useQuery({
     queryKey: ["my-results"],
     queryFn: async () => (await supabase.rpc("my_results")).data ?? [],
@@ -27,7 +28,7 @@ function Result() {
   return (
     <StudentShell>
       <div className="rounded-2xl border bg-card p-6 text-center sm:p-10">
-        <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Test Completed</p>
+        <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">TEST COMPLETED</p>
         <h1 className="mt-2 text-3xl font-extrabold">
           {r.show_results && passed && !r.pending_grading ? "Congratulations" : "Well done"}, {me?.profile?.full_name?.split(" ")[0] ?? ""}!
         </h1>
@@ -37,7 +38,7 @@ function Result() {
         ) : (
           <>
             <div className="mt-8 font-display text-7xl font-extrabold">{r.score}<span className="text-3xl text-muted-foreground">/{r.total}</span></div>
-            <p className="mt-1 text-2xl font-bold">{p}%</p>
+            <p className="mt-1 text-2xl font-bold">{p}% · Grade {gradeFor(p, settings?.grade_scale)}</p>
             <p className={cn("mx-auto mt-4 w-fit rounded-full px-5 py-2 text-lg font-extrabold",
               r.pending_grading ? "bg-muted" : passed ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground")}>
               {r.pending_grading ? "AWAITING MARKING" : passed ? "PASSED" : "FAILED"}
