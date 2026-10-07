@@ -331,6 +331,7 @@ export type Database = {
           elective_subjects: string[]
           electives_to_pick: number
           end_at: string | null
+          gift_message: string
           id: string
           instructions: string
           multi_subject: boolean
@@ -355,6 +356,7 @@ export type Database = {
           elective_subjects?: string[]
           electives_to_pick?: number
           end_at?: string | null
+          gift_message?: string
           id?: string
           instructions?: string
           multi_subject?: boolean
@@ -379,6 +381,7 @@ export type Database = {
           elective_subjects?: string[]
           electives_to_pick?: number
           end_at?: string | null
+          gift_message?: string
           id?: string
           instructions?: string
           multi_subject?: boolean
@@ -440,6 +443,7 @@ export type Database = {
         }[]
       }
       admin_reset_attempt: { Args: { _attempt_id: string }; Returns: undefined }
+      attempt_gift_message: { Args: { _attempt_id: string }; Returns: string }
       build_delivery: { Args: { _attempt_id: string }; Returns: Json }
       claim_admin: { Args: never; Returns: boolean }
       finalize_if_expired: { Args: { _attempt_id: string }; Returns: undefined }
