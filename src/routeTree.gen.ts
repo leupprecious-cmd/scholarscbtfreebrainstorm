@@ -10,33 +10,260 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as StaffRouteImport } from './routes/staff'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminQuestionsRouteImport } from './routes/_authenticated/admin/questions'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminStudentsRouteImport } from './routes/_authenticated/admin/students'
+import { Route as AuthenticatedAttemptAttemptIdRouteImport } from './routes/_authenticated/attempt.$attemptId'
+import { Route as AuthenticatedResultAttemptIdRouteImport } from './routes/_authenticated/result.$attemptId'
+import { Route as AuthenticatedTestTestIdRouteImport } from './routes/_authenticated/test.$testId'
+import { Route as AuthenticatedAdminResultsIndexRouteImport } from './routes/_authenticated/admin/results.index'
+import { Route as AuthenticatedAdminResultsAttemptIdRouteImport } from './routes/_authenticated/admin/results.$attemptId'
+import { Route as AuthenticatedAdminTestsIndexRouteImport } from './routes/_authenticated/admin/tests.index'
+import { Route as AuthenticatedAdminTestsTestIdRouteImport } from './routes/_authenticated/admin/tests.$testId'
+import { Route as AuthenticatedAdminTestsNewRouteImport } from './routes/_authenticated/admin/tests.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminQuestionsRoute =
+  AuthenticatedAdminQuestionsRouteImport.update({
+    id: '/questions',
+    path: '/questions',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminStudentsRoute =
+  AuthenticatedAdminStudentsRouteImport.update({
+    id: '/students',
+    path: '/students',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAttemptAttemptIdRoute =
+  AuthenticatedAttemptAttemptIdRouteImport.update({
+    id: '/attempt/$attemptId',
+    path: '/attempt/$attemptId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedResultAttemptIdRoute =
+  AuthenticatedResultAttemptIdRouteImport.update({
+    id: '/result/$attemptId',
+    path: '/result/$attemptId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTestTestIdRoute = AuthenticatedTestTestIdRouteImport.update({
+  id: '/test/$testId',
+  path: '/test/$testId',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminResultsIndexRoute =
+  AuthenticatedAdminResultsIndexRouteImport.update({
+    id: '/results/',
+    path: '/results/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminResultsAttemptIdRoute =
+  AuthenticatedAdminResultsAttemptIdRouteImport.update({
+    id: '/results/$attemptId',
+    path: '/results/$attemptId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminTestsIndexRoute =
+  AuthenticatedAdminTestsIndexRouteImport.update({
+    id: '/tests/',
+    path: '/tests/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminTestsTestIdRoute =
+  AuthenticatedAdminTestsTestIdRouteImport.update({
+    id: '/tests/$testId',
+    path: '/tests/$testId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminTestsNewRoute =
+  AuthenticatedAdminTestsNewRouteImport.update({
+    id: '/tests/new',
+    path: '/tests/new',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/staff': typeof StaffRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/students': typeof AuthenticatedAdminStudentsRoute
+  '/attempt/$attemptId': typeof AuthenticatedAttemptAttemptIdRoute
+  '/result/$attemptId': typeof AuthenticatedResultAttemptIdRoute
+  '/test/$testId': typeof AuthenticatedTestTestIdRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/results/$attemptId': typeof AuthenticatedAdminResultsAttemptIdRoute
+  '/admin/tests/$testId': typeof AuthenticatedAdminTestsTestIdRoute
+  '/admin/tests/new': typeof AuthenticatedAdminTestsNewRoute
+  '/admin/results/': typeof AuthenticatedAdminResultsIndexRoute
+  '/admin/tests/': typeof AuthenticatedAdminTestsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/staff': typeof StaffRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/students': typeof AuthenticatedAdminStudentsRoute
+  '/attempt/$attemptId': typeof AuthenticatedAttemptAttemptIdRoute
+  '/result/$attemptId': typeof AuthenticatedResultAttemptIdRoute
+  '/test/$testId': typeof AuthenticatedTestTestIdRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/results/$attemptId': typeof AuthenticatedAdminResultsAttemptIdRoute
+  '/admin/tests/$testId': typeof AuthenticatedAdminTestsTestIdRoute
+  '/admin/tests/new': typeof AuthenticatedAdminTestsNewRoute
+  '/admin/results': typeof AuthenticatedAdminResultsIndexRoute
+  '/admin/tests': typeof AuthenticatedAdminTestsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/staff': typeof StaffRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/admin/questions': typeof AuthenticatedAdminQuestionsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/students': typeof AuthenticatedAdminStudentsRoute
+  '/_authenticated/attempt/$attemptId': typeof AuthenticatedAttemptAttemptIdRoute
+  '/_authenticated/result/$attemptId': typeof AuthenticatedResultAttemptIdRoute
+  '/_authenticated/test/$testId': typeof AuthenticatedTestTestIdRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/results/$attemptId': typeof AuthenticatedAdminResultsAttemptIdRoute
+  '/_authenticated/admin/tests/$testId': typeof AuthenticatedAdminTestsTestIdRoute
+  '/_authenticated/admin/tests/new': typeof AuthenticatedAdminTestsNewRoute
+  '/_authenticated/admin/results/': typeof AuthenticatedAdminResultsIndexRoute
+  '/_authenticated/admin/tests/': typeof AuthenticatedAdminTestsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/staff'
+    | '/admin'
+    | '/dashboard'
+    | '/admin/questions'
+    | '/admin/settings'
+    | '/admin/students'
+    | '/attempt/$attemptId'
+    | '/result/$attemptId'
+    | '/test/$testId'
+    | '/admin/'
+    | '/admin/results/$attemptId'
+    | '/admin/tests/$testId'
+    | '/admin/tests/new'
+    | '/admin/results/'
+    | '/admin/tests/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/staff'
+    | '/dashboard'
+    | '/admin/questions'
+    | '/admin/settings'
+    | '/admin/students'
+    | '/attempt/$attemptId'
+    | '/result/$attemptId'
+    | '/test/$testId'
+    | '/admin'
+    | '/admin/results/$attemptId'
+    | '/admin/tests/$testId'
+    | '/admin/tests/new'
+    | '/admin/results'
+    | '/admin/tests'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/register'
+    | '/staff'
+    | '/_authenticated/admin'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/admin/questions'
+    | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/students'
+    | '/_authenticated/attempt/$attemptId'
+    | '/_authenticated/result/$attemptId'
+    | '/_authenticated/test/$testId'
+    | '/_authenticated/admin/'
+    | '/_authenticated/admin/results/$attemptId'
+    | '/_authenticated/admin/tests/$testId'
+    | '/_authenticated/admin/tests/new'
+    | '/_authenticated/admin/results/'
+    | '/_authenticated/admin/tests/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
+  StaffRoute: typeof StaffRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +275,191 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/questions': {
+      id: '/_authenticated/admin/questions'
+      path: '/questions'
+      fullPath: '/admin/questions'
+      preLoaderRoute: typeof AuthenticatedAdminQuestionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/students': {
+      id: '/_authenticated/admin/students'
+      path: '/students'
+      fullPath: '/admin/students'
+      preLoaderRoute: typeof AuthenticatedAdminStudentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/attempt/$attemptId': {
+      id: '/_authenticated/attempt/$attemptId'
+      path: '/attempt/$attemptId'
+      fullPath: '/attempt/$attemptId'
+      preLoaderRoute: typeof AuthenticatedAttemptAttemptIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/result/$attemptId': {
+      id: '/_authenticated/result/$attemptId'
+      path: '/result/$attemptId'
+      fullPath: '/result/$attemptId'
+      preLoaderRoute: typeof AuthenticatedResultAttemptIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/test/$testId': {
+      id: '/_authenticated/test/$testId'
+      path: '/test/$testId'
+      fullPath: '/test/$testId'
+      preLoaderRoute: typeof AuthenticatedTestTestIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/results/': {
+      id: '/_authenticated/admin/results/'
+      path: '/results'
+      fullPath: '/admin/results/'
+      preLoaderRoute: typeof AuthenticatedAdminResultsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/results/$attemptId': {
+      id: '/_authenticated/admin/results/$attemptId'
+      path: '/results/$attemptId'
+      fullPath: '/admin/results/$attemptId'
+      preLoaderRoute: typeof AuthenticatedAdminResultsAttemptIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/tests/': {
+      id: '/_authenticated/admin/tests/'
+      path: '/tests'
+      fullPath: '/admin/tests/'
+      preLoaderRoute: typeof AuthenticatedAdminTestsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/tests/$testId': {
+      id: '/_authenticated/admin/tests/$testId'
+      path: '/tests/$testId'
+      fullPath: '/admin/tests/$testId'
+      preLoaderRoute: typeof AuthenticatedAdminTestsTestIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/tests/new': {
+      id: '/_authenticated/admin/tests/new'
+      path: '/tests/new'
+      fullPath: '/admin/tests/new'
+      preLoaderRoute: typeof AuthenticatedAdminTestsNewRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminQuestionsRoute: typeof AuthenticatedAdminQuestionsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminStudentsRoute: typeof AuthenticatedAdminStudentsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminResultsAttemptIdRoute: typeof AuthenticatedAdminResultsAttemptIdRoute
+  AuthenticatedAdminTestsTestIdRoute: typeof AuthenticatedAdminTestsTestIdRoute
+  AuthenticatedAdminTestsNewRoute: typeof AuthenticatedAdminTestsNewRoute
+  AuthenticatedAdminResultsIndexRoute: typeof AuthenticatedAdminResultsIndexRoute
+  AuthenticatedAdminTestsIndexRoute: typeof AuthenticatedAdminTestsIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminQuestionsRoute: AuthenticatedAdminQuestionsRoute,
+    AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+    AuthenticatedAdminStudentsRoute: AuthenticatedAdminStudentsRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+    AuthenticatedAdminResultsAttemptIdRoute:
+      AuthenticatedAdminResultsAttemptIdRoute,
+    AuthenticatedAdminTestsTestIdRoute: AuthenticatedAdminTestsTestIdRoute,
+    AuthenticatedAdminTestsNewRoute: AuthenticatedAdminTestsNewRoute,
+    AuthenticatedAdminResultsIndexRoute: AuthenticatedAdminResultsIndexRoute,
+    AuthenticatedAdminTestsIndexRoute: AuthenticatedAdminTestsIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedAttemptAttemptIdRoute: typeof AuthenticatedAttemptAttemptIdRoute
+  AuthenticatedResultAttemptIdRoute: typeof AuthenticatedResultAttemptIdRoute
+  AuthenticatedTestTestIdRoute: typeof AuthenticatedTestTestIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedAttemptAttemptIdRoute: AuthenticatedAttemptAttemptIdRoute,
+  AuthenticatedResultAttemptIdRoute: AuthenticatedResultAttemptIdRoute,
+  AuthenticatedTestTestIdRoute: AuthenticatedTestTestIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
+  StaffRoute: StaffRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
