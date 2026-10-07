@@ -22,6 +22,7 @@ import { Route as AuthenticatedAttemptAttemptIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedResultAttemptIdRouteImport } from './routes/_authenticated/result.$attemptId'
 import { Route as AuthenticatedTestTestIdRouteImport } from './routes/_authenticated/test.$testId'
 import { Route as AuthenticatedAdminTestsIndexRouteImport } from './routes/_authenticated/admin/tests.index'
+import { Route as AuthenticatedAdminTestsTestIdRouteImport } from './routes/_authenticated/admin/tests.$testId'
 import { Route as AuthenticatedAdminTestsNewRouteImport } from './routes/_authenticated/admin/tests.new'
 
 const IndexRoute = IndexRouteImport.update({
@@ -92,6 +93,12 @@ const AuthenticatedAdminTestsIndexRoute =
     path: '/tests/',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminTestsTestIdRoute =
+  AuthenticatedAdminTestsTestIdRouteImport.update({
+    id: '/tests/$testId',
+    path: '/tests/$testId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminTestsNewRoute =
   AuthenticatedAdminTestsNewRouteImport.update({
     id: '/tests/new',
@@ -111,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/result/$attemptId': typeof AuthenticatedResultAttemptIdRoute
   '/test/$testId': typeof AuthenticatedTestTestIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/tests/$testId': typeof AuthenticatedAdminTestsTestIdRoute
   '/admin/tests/new': typeof AuthenticatedAdminTestsNewRoute
   '/admin/tests/': typeof AuthenticatedAdminTestsIndexRoute
 }
@@ -125,6 +133,7 @@ export interface FileRoutesByTo {
   '/result/$attemptId': typeof AuthenticatedResultAttemptIdRoute
   '/test/$testId': typeof AuthenticatedTestTestIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/tests/$testId': typeof AuthenticatedAdminTestsTestIdRoute
   '/admin/tests/new': typeof AuthenticatedAdminTestsNewRoute
   '/admin/tests': typeof AuthenticatedAdminTestsIndexRoute
 }
@@ -142,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/result/$attemptId': typeof AuthenticatedResultAttemptIdRoute
   '/_authenticated/test/$testId': typeof AuthenticatedTestTestIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/tests/$testId': typeof AuthenticatedAdminTestsTestIdRoute
   '/_authenticated/admin/tests/new': typeof AuthenticatedAdminTestsNewRoute
   '/_authenticated/admin/tests/': typeof AuthenticatedAdminTestsIndexRoute
 }
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/result/$attemptId'
     | '/test/$testId'
     | '/admin/'
+    | '/admin/tests/$testId'
     | '/admin/tests/new'
     | '/admin/tests/'
   fileRoutesByTo: FileRoutesByTo
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/result/$attemptId'
     | '/test/$testId'
     | '/admin'
+    | '/admin/tests/$testId'
     | '/admin/tests/new'
     | '/admin/tests'
   id:
@@ -189,6 +201,7 @@ export interface FileRouteTypes {
     | '/_authenticated/result/$attemptId'
     | '/_authenticated/test/$testId'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/tests/$testId'
     | '/_authenticated/admin/tests/new'
     | '/_authenticated/admin/tests/'
   fileRoutesById: FileRoutesById
@@ -294,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTestsIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/tests/$testId': {
+      id: '/_authenticated/admin/tests/$testId'
+      path: '/tests/$testId'
+      fullPath: '/admin/tests/$testId'
+      preLoaderRoute: typeof AuthenticatedAdminTestsTestIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/tests/new': {
       id: '/_authenticated/admin/tests/new'
       path: '/tests/new'
@@ -307,6 +327,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminQuestionsRoute: typeof AuthenticatedAdminQuestionsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminTestsTestIdRoute: typeof AuthenticatedAdminTestsTestIdRoute
   AuthenticatedAdminTestsNewRoute: typeof AuthenticatedAdminTestsNewRoute
   AuthenticatedAdminTestsIndexRoute: typeof AuthenticatedAdminTestsIndexRoute
 }
@@ -315,6 +336,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminQuestionsRoute: AuthenticatedAdminQuestionsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+    AuthenticatedAdminTestsTestIdRoute: AuthenticatedAdminTestsTestIdRoute,
     AuthenticatedAdminTestsNewRoute: AuthenticatedAdminTestsNewRoute,
     AuthenticatedAdminTestsIndexRoute: AuthenticatedAdminTestsIndexRoute,
   }
