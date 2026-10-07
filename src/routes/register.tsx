@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useHydrated } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/AuthCard";
@@ -28,6 +29,7 @@ function Register() {
   const { data: lists } = useLists();
   const [f, setF] = useState({ full_name: "", student_id: "", phone: "", email: "", password: "", confirm: "", class: "" });
   const [busy, setBusy] = useState(false);
+  const hydrated = useHydrated();
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF((prev) => ({ ...prev, [k]: e.target.value }));
 
   async function submit(e: React.FormEvent) {
