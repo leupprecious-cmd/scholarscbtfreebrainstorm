@@ -16,16 +16,19 @@ export type Database = {
     Tables: {
       app_settings: {
         Row: {
+          grade_scale: Json
           id: number
           lesson_name: string
           show_rankings: boolean
         }
         Insert: {
+          grade_scale?: Json
           id?: number
           lesson_name?: string
           show_rankings?: boolean
         }
         Update: {
+          grade_scale?: Json
           id?: number
           lesson_name?: string
           show_rankings?: boolean
@@ -94,6 +97,24 @@ export type Database = {
           },
         ]
       }
+      classes: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           class: string
@@ -101,6 +122,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          phone: string
           student_id: string
         }
         Insert: {
@@ -109,6 +131,7 @@ export type Database = {
           email?: string
           full_name?: string
           id: string
+          phone?: string
           student_id?: string
         }
         Update: {
@@ -117,6 +140,7 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          phone?: string
           student_id?: string
         }
         Relationships: []
@@ -165,8 +189,27 @@ export type Database = {
           },
         ]
       }
+      subjects: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       tests: {
         Row: {
+          attempts_allowed: number
           class: string
           created_at: string
           duration_minutes: number
@@ -181,6 +224,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          attempts_allowed?: number
           class?: string
           created_at?: string
           duration_minutes?: number
@@ -195,6 +239,7 @@ export type Database = {
           title: string
         }
         Update: {
+          attempts_allowed?: number
           class?: string
           created_at?: string
           duration_minutes?: number
@@ -261,6 +306,7 @@ export type Database = {
           status: string
           subject: string
           submitted_at: string
+          test_id: string
           test_title: string
           total: number
           unanswered_count: number
@@ -276,6 +322,8 @@ export type Database = {
       student_tests: {
         Args: never
         Returns: {
+          attempts_allowed: number
+          attempts_used: number
           class: string
           duration_minutes: number
           end_at: string
