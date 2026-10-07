@@ -47,10 +47,11 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
       ev.preventDefault();
       setBusy(true);
       await onSubmit({
-        title: v.title.trim(), subject: v.subject, class: v.class === "__all" ? "" : v.class, instructions: v.instructions,
+        title: v.title.trim(), subject: v.multi_subject && !v.subject ? "UTME Combination" : v.subject, class: v.class === "__all" ? "" : v.class, instructions: v.instructions,
         duration_minutes: Number(v.duration_minutes) || 30, pass_percentage: Number(v.pass_percentage) || 50,
         attempts_allowed: Math.max(1, Number(v.attempts_allowed) || 1),
         shuffle_questions: v.shuffle_questions, shuffle_options: v.shuffle_options, draw_count: drawn,
+        multi_subject: v.multi_subject, per_subject_count: Math.max(1, Number(v.per_subject_count) || 20),
         show_results: v.show_results, start_at: fromLocal(v.sd, v.st), end_at: fromLocal(v.ed, v.et),
       });
       setBusy(false);
@@ -125,7 +126,7 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
         <Switch checked={v.show_results} onCheckedChange={(c) => setV((prev) => ({ ...prev, show_results: c }))} id="sr" />
         <Label htmlFor="sr">Show results to students immediately after submitting</Label>
       </div>
-      <div className="sm:col-span-2"><Button disabled={busy || !v.subject || tooMany} className="h-11">{busy ? "Saving..." : submitLabel}</Button></div>
+      <div className="sm:col-span-2"><Button disabled={busy || (!v.subject && !v.multi_subject) || tooMany} className="h-11">{busy ? "Saving..." : submitLabel}</Button></div>
     </form>
   );
 }
