@@ -35,7 +35,7 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
     sd: s.d, st: s.t, ed: e.d, et: e.t,
   });
   const [busy, setBusy] = useState(false);
-  const up = (k: string) => (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setV({ ...v, [k]: ev.target.value });
+  const up = (k: string) => (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setV((prev) => ({ ...prev, [k]: ev.target.value }));
   const drawn = Number(v.draw_count) > 0 ? Number(v.draw_count) : null;
   const tooMany = drawn != null && questionCount != null && drawn > questionCount;
 
@@ -54,13 +54,13 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
     }}>
       <F label="Test Title" className="sm:col-span-2"><Input required value={v.title} onChange={up("title")} placeholder="Mathematics CBT Test 1" /></F>
       <F label="Subject">
-        <Select value={v.subject} onValueChange={(x) => setV({ ...v, subject: x })}>
+        <Select value={v.subject} onValueChange={(x) => setV((prev) => ({ ...prev, subject: x }))}>
           <SelectTrigger><SelectValue placeholder="Choose subject" /></SelectTrigger>
           <SelectContent>{(lists?.subjects ?? []).map((x) => <SelectItem key={x.id} value={x.name}>{x.name}</SelectItem>)}</SelectContent>
         </Select>
       </F>
       <F label="Class">
-        <Select value={v.class || "__all"} onValueChange={(x) => setV({ ...v, class: x })}>
+        <Select value={v.class || "__all"} onValueChange={(x) => setV((prev) => ({ ...prev, class: x }))}>
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="__all">All classes</SelectItem>
@@ -84,11 +84,11 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
           <p className="text-sm text-muted-foreground">Every student gets their own copy of the test. Nobody can copy from a neighbour.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Switch id="sq" checked={v.shuffle_questions} onCheckedChange={(c) => setV({ ...v, shuffle_questions: c })} />
+          <Switch id="sq" checked={v.shuffle_questions} onCheckedChange={(c) => setV((prev) => ({ ...prev, shuffle_questions: c }))} />
           <Label htmlFor="sq" className="cursor-pointer font-normal">Shuffle the question order for each student</Label>
         </div>
         <div className="flex items-center gap-3">
-          <Switch id="so" checked={v.shuffle_options} onCheckedChange={(c) => setV({ ...v, shuffle_options: c })} />
+          <Switch id="so" checked={v.shuffle_options} onCheckedChange={(c) => setV((prev) => ({ ...prev, shuffle_options: c }))} />
           <Label htmlFor="so" className="cursor-pointer font-normal">Shuffle the answer options (A, B, C, D) for each student</Label>
         </div>
         <F label="Questions to give each student (leave empty to use all)">
@@ -102,7 +102,7 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
       </div>
 
       <div className="flex items-center gap-3 sm:col-span-2">
-        <Switch checked={v.show_results} onCheckedChange={(c) => setV({ ...v, show_results: c })} id="sr" />
+        <Switch checked={v.show_results} onCheckedChange={(c) => setV((prev) => ({ ...prev, show_results: c }))} id="sr" />
         <Label htmlFor="sr">Show results to students immediately after submitting</Label>
       </div>
       <div className="sm:col-span-2"><Button disabled={busy || !v.subject || tooMany} className="h-11">{busy ? "Saving..." : submitLabel}</Button></div>
