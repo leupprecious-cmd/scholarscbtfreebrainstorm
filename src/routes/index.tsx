@@ -59,7 +59,7 @@ function Home() {
           </div>
         ))}
       </section>
-      <footer className="pb-8 text-center text-sm text-muted-foreground">© SCHOLARS CBT</footer>
+      <footer className="pb-8 text-center text-sm text-muted-foreground">© SCHOLARS CBT · <Link to="/staff" className="underline opacity-60 hover:opacity-100">Staff login</Link></footer>
     </main>
   );
 }
