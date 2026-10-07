@@ -8,6 +8,6 @@
 - [x] Grades with editable grading scale
 - [x] Question bank: filter + reuse in other tests; results filter by subject
 - [x] Remove test accounts so owner can claim admin
-- [ ] Finish browser verification of JAMB randomisation + immediate results
-- [ ] Bulk question import (paste or file upload) so large banks (e.g. 1000 questions) can be loaded at once
-- [ ] Paginate/limit question lists so 1000-row tests stay fast in admin pages
+- [x] Finish browser verification of JAMB randomisation + immediate results
+- [x] Bulk question import (paste or file upload) so large banks (e.g. 1000 questions) can be loaded at once
+- [x] Paginate/limit question lists so 1000-row tests stay fast in admin pages
