@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useHydrated } from "@tanstack/react-query";
+import { useHydrated } from "@/lib/use-hydrated";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/AuthCard";

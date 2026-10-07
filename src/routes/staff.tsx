@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { useHydrated } from "@/lib/use-hydrated";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/AuthCard";
 import { LoginForm } from "@/components/LoginForm";
@@ -65,7 +66,7 @@ function Setup() {
         <div className="space-y-1.5"><Label>Your name</Label><Input required value={f.name} onChange={(e) => setF((prev) => ({ ...prev, name: e.target.value }))} className="h-12" /></div>
         <div className="space-y-1.5"><Label>Email</Label><Input type="email" required value={f.email} onChange={(e) => setF((prev) => ({ ...prev, email: e.target.value }))} className="h-12" /></div>
         <div className="space-y-1.5"><Label>Password</Label><Input type="password" minLength={8} required value={f.password} onChange={(e) => setF((prev) => ({ ...prev, password: e.target.value }))} className="h-12" /></div>
-        <Button disabled={busy} className="h-12 w-full">{busy ? "Creating..." : "Create administrator"}</Button>
+        <Button disabled={busy || !hydrated} className="h-12 w-full">{busy ? "Creating..." : "Create administrator"}</Button>
       </form>
     </AuthCard>
   );
