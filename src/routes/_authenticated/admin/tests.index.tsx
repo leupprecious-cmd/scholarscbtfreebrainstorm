@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_authenticated/admin/tests/")({
   component: TestsList,
 });
 
-export function StatusBadge({ s }: { s: string }) {
+function StatusBadge({ s }: { s: string }) {
   return <Badge variant={s === "published" ? "default" : s === "closed" ? "destructive" : "secondary"} className="capitalize">{s}</Badge>;
 }
 
