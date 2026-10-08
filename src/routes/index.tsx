@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GraduationCap, Laptop, LineChart, MousePointerClick, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import hall from "@/assets/cbt-hall.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,8 +28,10 @@ const features = [
 function Home() {
   return (
     <main className="min-h-screen bg-background">
-      <section className="bg-primary text-primary-foreground">
-        <div className="mx-auto max-w-5xl px-5 pb-20 pt-6">
+      <section className="relative overflow-hidden text-primary-foreground">
+        <img src={hall} alt="Students writing a CBT exam in a large examination hall" width={1600} height={912} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/75 to-primary/30" />
+        <div className="relative mx-auto max-w-5xl px-5 pb-24 pt-6">
           <div className="flex items-center gap-2">
             <GraduationCap className="h-7 w-7" />
             <span className="font-display text-lg font-extrabold tracking-wide">SCHOLARS CBT</span>
