@@ -43,14 +43,15 @@ function EditTest() {
   const countOf = (n: string) => questions.filter((q) => q.subject.toLowerCase() === n.toLowerCase()).length;
   const list = t.multi_subject ? questions.filter((q) => q.subject.toLowerCase() === cur.toLowerCase()) : questions;
   const shown = showAll ? list : list.slice(0, 50);
-  const short = subjects.filter((n) => countOf(n) < t.per_subject_count);
+  const need = (n: string) => t.per_subject_count + (t.compulsory_subjects.includes(n) ? 10 : 0);
+  const short = subjects.filter((n) => countOf(n) < need(n));
   const total = questions.reduce((s, q) => s + Number(q.marks), 0);
   const drawn = t.draw_count && t.draw_count < questions.length ? t.draw_count : questions.length;
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin-test-qs", testId] }); qc.invalidateQueries({ queryKey: ["admin-tests"] }); };
 
   const setStatus = async (status: string) => {
     if (status === "published" && t.multi_subject && short.length) {
-      toast.error(`Each subject needs at least ${t.per_subject_count} questions. Add more to: ${short.join(", ")}`);
+      toast.error(`Not enough questions. Add more to: ${short.map((n) => `${n} (needs ${need(n)})`).join(", ")}`);
       return;
     }
     if (status === "published" && questions.length === 0) { toast.error("Add at least one question first"); return; }
@@ -92,7 +93,7 @@ function EditTest() {
                 <button key={n} type="button" onClick={() => { setSubj(n); setEditing(null); setShowAll(false); }}
                   className={`rounded-xl border-2 p-3 text-left ${n === cur ? "border-primary bg-primary/10" : "border-border bg-card"}`}>
                   <p className="font-bold">{n}</p>
-                  <p className="text-xs text-muted-foreground">{countOf(n)} question(s){t.compulsory_subjects.includes(n) ? " · Compulsory" : ""}</p>
+                  <p className="text-xs text-muted-foreground">{countOf(n)} / {need(n)} needed{t.compulsory_subjects.includes(n) ? " · Compulsory" : ""}</p>
                 </button>
               ))}
             </div>
@@ -149,7 +150,7 @@ function EditTest() {
               ["Test name", t.title], ["Subject", t.subject], ["Class", t.class || "All classes"],
               ["Questions", questions.length], ["Total marks", total], ["Duration", `${t.duration_minutes} minutes`],
               ["Pass mark", `${t.pass_percentage}%`],
-              ...(t.multi_subject ? [["Subjects", subjects.map((n) => `${n}: ${countOf(n)}`).join(", ")], ["Each student gets", `${t.per_subject_count} per subject × 3 = ${t.per_subject_count * 3} questions`]] : []),
+              ...(t.multi_subject ? [["Subjects", subjects.map((n) => `${n}: ${countOf(n)}`).join(", ")], ["Each student gets", `${t.compulsory_subjects.join(", ")} ${t.per_subject_count + 10} + ${t.electives_to_pick} choices × ${t.per_subject_count} = ${t.per_subject_count * (t.compulsory_subjects.length + t.electives_to_pick) + 10 * t.compulsory_subjects.length} questions`]] : []),
               [t.multi_subject ? "Without subjects" : "Each student gets", drawn === questions.length ? `${drawn} questions` : `${drawn} of ${questions.length}, drawn at random`],
               ["Question order", t.shuffle_questions ? "Shuffled for each student" : "Same for everyone"],
               ["Answer options", t.shuffle_options ? "Shuffled for each student" : "Same for everyone"],
