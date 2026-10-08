@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { AiTutor } from "@/components/AiTutor";
 
 type Row = { id: string; text: string; type: string; subject: string; options: string[]; correct: string; answer: string; marks: number };
 
@@ -20,6 +21,7 @@ export function Corrections({ attemptId }: { attemptId: string }) {
     <div className="mt-8 text-left">
       <h2 className="text-xl font-bold">Corrections</h2>
       <p className="text-sm text-muted-foreground">See what you got right and wrong.</p>
+      <AiTutor attemptId={attemptId} />
       <div className="mt-3 space-y-3">
         {data.map((q, i) => {
           const isChoice = q.type === "mcq" || q.type === "true_false";
