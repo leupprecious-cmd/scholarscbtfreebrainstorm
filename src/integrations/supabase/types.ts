@@ -302,6 +302,62 @@ export type Database = {
           },
         ]
       }
+      student_topic_progress: {
+        Row: {
+          created_at: string
+          student_id: string
+          topic_id: string
+        }
+        Insert: {
+          created_at?: string
+          student_id?: string
+          topic_id: string
+        }
+        Update: {
+          created_at?: string
+          student_id?: string
+          topic_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_topic_progress_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "study_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_topics: {
+        Row: {
+          class_name: string
+          created_at: string
+          id: string
+          subject_name: string
+          term: string
+          title: string
+          topic_order: number
+        }
+        Insert: {
+          class_name: string
+          created_at?: string
+          id?: string
+          subject_name: string
+          term: string
+          title: string
+          topic_order?: number
+        }
+        Update: {
+          class_name?: string
+          created_at?: string
+          id?: string
+          subject_name?: string
+          term?: string
+          title?: string
+          topic_order?: number
+        }
+        Relationships: []
+      }
       subjects: {
         Row: {
           created_at: string

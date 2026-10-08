@@ -43,6 +43,11 @@ function Dashboard() {
 
       <Announcements />
 
+      <Link to="/syllabus" className="mt-4 flex items-center justify-between rounded-2xl border bg-card p-4 font-bold hover:bg-muted">
+        <span className="flex items-center gap-2"><GraduationCap className="h-5 w-5 text-primary" />My SS1–SS3 Study Topics</span>
+        <span className="text-primary">Open →</span>
+      </Link>
+
       <Section title="Available Tests" empty="No tests available right now.">
         {available.map((t) => (
           <TestCard key={t.id} t={t}>
