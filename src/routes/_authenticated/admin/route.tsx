@@ -4,6 +4,7 @@ import { BarChart3, Megaphone, FileText, LayoutDashboard, ListChecks, LogOut, Ra
 import { supabase } from "@/integrations/supabase/client";
 import { getIsAdmin } from "@/lib/auth";
 import { NotificationBell } from "@/components/NotificationBell";
+import { HallWatermark } from "@/components/HallWatermark";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ context }) => {
@@ -35,8 +36,9 @@ function AdminLayout() {
     navigate({ to: "/staff", replace: true });
   }
   return (
-    <div className="min-h-screen bg-background md:flex">
-      <aside className="bg-sidebar text-sidebar-foreground md:sticky md:top-0 md:h-screen md:w-60 md:shrink-0">
+    <div className="relative min-h-screen bg-background md:flex">
+      <HallWatermark />
+      <aside className="relative z-10 bg-sidebar text-sidebar-foreground md:sticky md:top-0 md:h-screen md:w-60 md:shrink-0">
         <div className="px-4 py-4">
           <p className="text-xs uppercase tracking-widest opacity-70">Admin</p>
           <p className="font-display text-lg font-extrabold">SCHOLARS CBT</p>
@@ -55,7 +57,7 @@ function AdminLayout() {
           </button>
         </nav>
       </aside>
-      <main className="min-w-0 flex-1 px-4 py-6 md:px-8">
+      <main className="relative z-10 min-w-0 flex-1 px-4 py-6 md:px-8">
         <Outlet />
       </main>
     </div>
