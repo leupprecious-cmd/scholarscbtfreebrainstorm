@@ -87,16 +87,16 @@ export function TestForm({ initial, onSubmit, submitLabel, questionCount }: { in
       <div className="space-y-4 rounded-2xl border bg-muted/40 p-4 sm:col-span-2">
         <div>
           <p className="font-bold">Subject Combination (UTME style)</p>
-          <p className="text-sm text-muted-foreground">Mathematics is compulsory. Each student picks 2 from English, Physics, Chemistry and Biology.</p>
+          <p className="text-sm text-muted-foreground">English is compulsory. Each student picks 3 from Mathematics, Physics, Chemistry and Biology.</p>
         </div>
         <div className="flex items-center gap-3">
           <Switch id="ms" checked={v.multi_subject} onCheckedChange={(c) => setV((prev) => ({ ...prev, multi_subject: c }))} />
           <Label htmlFor="ms" className="cursor-pointer font-normal">Let students choose their subjects</Label>
         </div>
         {v.multi_subject && (
-          <F label="Questions per subject">
+          <F label="Questions per choice subject">
             <Input type="number" min={1} value={v.per_subject_count} onChange={up("per_subject_count")} className="max-w-40" />
-            <p className="text-sm text-muted-foreground">Each student gets {(Number(v.per_subject_count) || 0) * 3} questions in total (3 subjects).</p>
+            <p className="text-sm text-muted-foreground">English: {(Number(v.per_subject_count) || 0) + 10} questions · Choice subjects: {Number(v.per_subject_count) || 0} each · Total: {(Number(v.per_subject_count) || 0) * 4 + 10} questions.</p>
           </F>
         )}
       </div>
