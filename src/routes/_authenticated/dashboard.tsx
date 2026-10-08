@@ -64,7 +64,7 @@ function Dashboard() {
         <div>
           <Section title="Available Examinations" empty="No examinations available right now.">
             {available.map((t) => (
-              <TestCard key={t.id} t={t} live>
+              <TestCard key={t.id} t={t}>
                 <Button asChild className="h-12 w-full bg-success text-base text-success-foreground hover:bg-success/90 sm:w-auto sm:px-8">
                   <Link to="/test/$testId" params={{ testId: t.id }}>{inProgress.has(t.id) ? "Continue CBT" : "Start CBT"}</Link>
                 </Button>
@@ -166,4 +166,8 @@ function TestCard({ t, children }: { t: T; children: ReactNode }) {
       <div className="mt-4 flex flex-wrap items-center gap-3">{children}</div>
     </div>
   );
+}
+
+function Stat({ n, l }: { n: number; l: string }) {
+  return <div className="border-r p-3 last:border-r-0"><p className="font-display text-2xl font-extrabold text-primary">{n}</p><p className="text-xs font-bold uppercase text-muted-foreground">{l}</p></div>;
 }
