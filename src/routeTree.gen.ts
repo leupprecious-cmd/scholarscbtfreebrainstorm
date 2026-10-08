@@ -16,6 +16,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedSyllabusRouteImport } from './routes/_authenticated/syllabus'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminLiveRouteImport } from './routes/_authenticated/admin/live'
 import { Route as AuthenticatedAdminMessagesRouteImport } from './routes/_authenticated/admin/messages'
@@ -63,6 +64,11 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSyllabusRoute = AuthenticatedSyllabusRouteImport.update({
+  id: '/syllabus',
+  path: '/syllabus',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/staff': typeof StaffRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/syllabus': typeof AuthenticatedSyllabusRoute
   '/admin/live': typeof AuthenticatedAdminLiveRoute
   '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/staff': typeof StaffRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/syllabus': typeof AuthenticatedSyllabusRoute
   '/admin/live': typeof AuthenticatedAdminLiveRoute
   '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
@@ -199,6 +207,7 @@ export interface FileRoutesById {
   '/staff': typeof StaffRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/syllabus': typeof AuthenticatedSyllabusRoute
   '/_authenticated/admin/live': typeof AuthenticatedAdminLiveRoute
   '/_authenticated/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/_authenticated/admin/questions': typeof AuthenticatedAdminQuestionsRoute
@@ -223,6 +232,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/admin'
     | '/dashboard'
+    | '/syllabus'
     | '/admin/live'
     | '/admin/messages'
     | '/admin/questions'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/staff'
     | '/dashboard'
+    | '/syllabus'
     | '/admin/live'
     | '/admin/messages'
     | '/admin/questions'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/syllabus'
     | '/_authenticated/admin/live'
     | '/_authenticated/admin/messages'
     | '/_authenticated/admin/questions'
@@ -340,6 +352,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/syllabus': {
+      id: '/_authenticated/syllabus'
+      path: '/syllabus'
+      fullPath: '/syllabus'
+      preLoaderRoute: typeof AuthenticatedSyllabusRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
@@ -481,6 +500,7 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSyllabusRoute: typeof AuthenticatedSyllabusRoute
   AuthenticatedAttemptAttemptIdRoute: typeof AuthenticatedAttemptAttemptIdRoute
   AuthenticatedResultAttemptIdRoute: typeof AuthenticatedResultAttemptIdRoute
   AuthenticatedTestTestIdRoute: typeof AuthenticatedTestTestIdRoute
@@ -489,6 +509,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSyllabusRoute: AuthenticatedSyllabusRoute,
   AuthenticatedAttemptAttemptIdRoute: AuthenticatedAttemptAttemptIdRoute,
   AuthenticatedResultAttemptIdRoute: AuthenticatedResultAttemptIdRoute,
   AuthenticatedTestTestIdRoute: AuthenticatedTestTestIdRoute,
