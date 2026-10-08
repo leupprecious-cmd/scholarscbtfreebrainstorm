@@ -33,7 +33,7 @@ export const explainMistakes = createServerFn({ method: "POST" })
       return `Q${i + 1} [${q.subject || "General"}]: ${q.text}${opts}\nStudent answered: ${yours}\nCorrect answer: ${right}`;
     }).join("\n\n");
 
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { ok: false as const, message: "AI tutor is not configured." };
     const { createOpenAI } = await import("@ai-sdk/openai");
     const { streamText } = await import("ai");
